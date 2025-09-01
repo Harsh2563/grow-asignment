@@ -77,43 +77,43 @@
 }
 
 .dark {
-  /* Dark navy blue background like in the finance dashboard image */
-  --background: #1A202C;
+  /* Dark navy blue background */
+  --background: #1a202c;
   --foreground: #ffffff;
   /* Slightly lighter navy blue for cards */
-  --card: #2D3748;
+  --card: #2d3748;
   --card-foreground: #ffffff;
-  --popover: #2D3748;
+  --popover: #2d3748;
   --popover-foreground: #ffffff;
-  /* Teal accent color for primary actions - matching Add Widget button */
-  --primary: #38B2AC;
+  /* Green accent color for primary actions */
+  --primary: #38b2ac;
   --primary-foreground: #ffffff;
   /* Slightly lighter blue for secondary elements */
-  --secondary: #4A5568;
+  --secondary: #4a5568;
   --secondary-foreground: #ffffff;
-  --muted: #4A5568;
-  --muted-foreground: #A0AEC0;
-  --accent: #4A5568;
+  --muted: #4a5568;
+  --muted-foreground: #a0aec0;
+  --accent: #4a5568;
   --accent-foreground: #ffffff;
-  --destructive: #F56565;
-  --border: #4A5568;
-  --input: #2D3748;
-  --ring: #38B2AC;
+  --destructive: #f56565;
+  --border: #4a5568;
+  --input: #2d3748;
+  --ring: #38b2ac;
   /* Chart colors */
-  --chart-1: #38B2AC;
-  --chart-2: #4299E1;
-  --chart-3: #ECC94B;
-  --chart-4: #ED64A6;
-  --chart-5: #9F7AEA;
+  --chart-1: #38b2ac;
+  --chart-2: #4299e1;
+  --chart-3: #ecc94b;
+  --chart-4: #ed64a6;
+  --chart-5: #9f7aea;
   /* Sidebar colors */
-  --sidebar: #2D3748;
+  --sidebar: #2d3748;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #38B2AC;
+  --sidebar-primary: #38b2ac;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #4A5568;
+  --sidebar-accent: #4a5568;
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #4A5568;
-  --sidebar-ring: #38B2AC;
+  --sidebar-border: #4a5568;
+  --sidebar-ring: #38b2ac;
 }
 
 @layer base {
@@ -122,6 +122,16 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.025em;
   }
 }
-

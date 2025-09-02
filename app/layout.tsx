@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/theme-toggle-new";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { FinanceLogo } from "@/components/svgs";
+import { NewWidgetDialog } from "@/components/new-widget-dialog";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -47,12 +48,7 @@ export default function RootLayout({
               <h1 className={`text-lg font-bold`}>Finance Dashboard</h1>
             </div>
             <div className="flex items-center gap-4">
-              <Button
-                size="sm"
-                className="bg-primary hover:bg-primary/90 text-white border-none rounded-md"
-              >
-                <PlusIcon className="h-4 w-4 mr-1.5" /> Add Widget
-              </Button>
+              <NewWidgetDialog />
               <ThemeToggle />
             </div>
           </header>

@@ -15,9 +15,12 @@ interface AddApiKeyDialogProps {
   onOpenChange: (open: boolean) => void;
   keyName: string;
   keyValue: string;
+  provider: string;
   errorMessage: string;
+  isLoading?: boolean;
   onKeyNameChange: (value: string) => void;
   onKeyValueChange: (value: string) => void;
+  onProviderChange: (value: string) => void;
   onSubmit: () => void;
   onCancel: () => void;
   triggerButton?: React.ReactNode;
@@ -28,9 +31,12 @@ export const AddApiKeyDialog = ({
   onOpenChange,
   keyName,
   keyValue,
+  provider,
   errorMessage,
+  isLoading = false,
   onKeyNameChange,
   onKeyValueChange,
+  onProviderChange,
   onSubmit,
   onCancel,
   triggerButton,
@@ -43,8 +49,8 @@ export const AddApiKeyDialog = ({
         <DialogHeader>
           <DialogTitle>Add New API Key</DialogTitle>
           <DialogDescription>
-            Enter a name and value for your API key. The key will be stored
-            securely in your browser.
+            Enter a name and value for your API key. The key will be tested
+            before saving to ensure it works properly.
           </DialogDescription>
         </DialogHeader>
 
@@ -56,8 +62,11 @@ export const AddApiKeyDialog = ({
           <NewApiKeyForm
             keyName={keyName}
             keyValue={keyValue}
+            provider={provider}
+            isLoading={isLoading}
             onKeyNameChange={onKeyNameChange}
             onKeyValueChange={onKeyValueChange}
+            onProviderChange={onProviderChange}
             onCancel={onCancel}
             onSave={onSubmit}
           />

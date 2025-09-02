@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ApiKeysManager } from "@/lib/api-keys-manager";
+import { testApiKey } from "@/lib/api-key-tester";
 import { Button } from "@/components/ui/button";
 import { Key as KeyIcon, Plus as PlusIcon } from "lucide-react";
 import { ConditionalRenderer } from "@/ConditionalRenderer/ConditionalRenderer";
@@ -13,6 +14,7 @@ interface ApiKey {
   id: string;
   name: string;
   key: string;
+  provider?: 'alphavantage' | 'twelvedata' | 'finnhub';
   createdAt: Date;
   lastUsed?: Date;
 }
@@ -22,7 +24,9 @@ export const ApiKeysManagerComponent = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [newKeyValue, setNewKeyValue] = useState("");
+  const [newKeyProvider, setNewKeyProvider] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isTestingKey, setIsTestingKey] = useState(false);
 
   useEffect(() => {
     loadApiKeys();
@@ -33,7 +37,15 @@ export const ApiKeysManagerComponent = () => {
     setApiKeys(keys);
   };
 
-  const handleAddKey = () => {
+  const handleAddKey = async () => {
+    // Clear previous error
+    setErrorMessage("");
+    
+    if (!newKeyProvider) {
+      setErrorMessage("Please select a provider");
+      return;
+    }
+
     // Validate inputs
     if (!newKeyName.trim()) {
       setErrorMessage("API Key name is required");
@@ -51,15 +63,33 @@ export const ApiKeysManagerComponent = () => {
       return;
     }
 
-    ApiKeysManager.addApiKey(newKeyName, newKeyValue);
+    // Test the API key before saving
+    setIsTestingKey(true);
+    try {
+      const testResult = await testApiKey(newKeyValue, newKeyProvider as 'alphavantage' | 'twelvedata' | 'finnhub');
+      
+      if (!testResult.success) {
+        setErrorMessage(`API Key validation failed: ${testResult.message || 'The API key is not working properly'}`);
+        return;
+      }
 
-    handleCancelAddKey();
-    loadApiKeys();
+      // If validation passes, save the key
+      ApiKeysManager.addApiKey(newKeyName, newKeyValue, newKeyProvider as 'alphavantage' | 'twelvedata' | 'finnhub');
+      handleCancelAddKey();
+      loadApiKeys();
+      
+    } catch (error) {
+      console.error('Error testing API key:', error);
+      setErrorMessage('Failed to test API key. Please check your internet connection and try again.');
+    } finally {
+      setIsTestingKey(false);
+    }
   };
 
   const handleCancelAddKey = () => {
     setNewKeyName("");
     setNewKeyValue("");
+    setNewKeyProvider("");
     setErrorMessage("");
     setIsAddDialogOpen(false);
   };
@@ -102,9 +132,12 @@ export const ApiKeysManagerComponent = () => {
         onOpenChange={setIsAddDialogOpen}
         keyName={newKeyName}
         keyValue={newKeyValue}
+        provider={newKeyProvider}
         errorMessage={errorMessage}
+        isLoading={isTestingKey}
         onKeyNameChange={setNewKeyName}
         onKeyValueChange={setNewKeyValue}
+        onProviderChange={setNewKeyProvider}
         onSubmit={handleAddKey}
         onCancel={handleCancelAddKey}
       />

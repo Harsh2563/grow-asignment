@@ -5,8 +5,11 @@ interface ApiKey {
   id: string;
   name: string;
   key: string;
+  provider?: 'alphavantage' | 'twelvedata' | 'finnhub';
   createdAt: Date;
   lastUsed?: Date;
+  isValid?: boolean;
+  lastTested?: Date;
 }
 
 export class ApiKeysManager {
@@ -16,15 +19,17 @@ export class ApiKeysManager {
    * Add a new API key
    * @param name A friendly name for the API key
    * @param key The actual API key value
+   * @param provider The financial data provider (optional)
    * @returns The newly created API key object
    */
-  static addApiKey(name: string, key: string): ApiKey {
+  static addApiKey(name: string, key: string, provider?: 'alphavantage' | 'twelvedata' | 'finnhub'): ApiKey {
     const apiKeys = this.getApiKeys();
 
     const newApiKey: ApiKey = {
       id: crypto.randomUUID(),
       name,
       key,
+      provider,
       createdAt: new Date(),
     };
 
@@ -127,6 +132,31 @@ export class ApiKeysManager {
    */
   static recordKeyUsage(id: string): void {
     this.updateApiKey(id, { lastUsed: new Date() });
+  }
+
+  /**
+   * Update the validation status of an API key
+   * @param id The ID of the API key to update
+   * @param isValid Whether the API key is valid
+   */
+  static updateKeyValidation(id: string, isValid: boolean): void {
+    this.updateApiKey(id, { isValid, lastTested: new Date() });
+  }
+
+  /**
+   * Get all valid API keys (those that have been tested and are working)
+   * @returns Array of valid API key objects
+   */
+  static getValidApiKeys(): ApiKey[] {
+    return this.getApiKeys().filter(key => key.isValid === true);
+  }
+
+  /**
+   * Get all untested API keys (those that haven't been validated yet)
+   * @returns Array of untested API key objects
+   */
+  static getUntestedApiKeys(): ApiKey[] {
+    return this.getApiKeys().filter(key => key.isValid === undefined);
   }
 
   /**

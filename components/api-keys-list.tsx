@@ -8,8 +8,10 @@ interface ApiKey {
   name: string;
   key: string;
   provider?: "finnhub";
-  createdAt: Date;
-  lastUsed?: Date;
+  createdAt: string;
+  lastUsed?: string;
+  isValid?: boolean;
+  usageCount?: number;
 }
 
 interface ApiKeysListProps {

@@ -3,19 +3,26 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import widgetsReducer from "./slices/widgetsSlice";
+import apiKeysReducer from "./slices/apiKeysSlice";
 
 const persistConfig = {
-  key: "finboard-widgets",
+  key: "finboard-store",
   storage,
-  whitelist: ["widgets"],
+  whitelist: ["widgets", "apiKeys"],
 };
 
-const persistedWidgetsReducer = persistReducer(persistConfig, widgetsReducer);
+const rootReducer = {
+  widgets: widgetsReducer,
+  apiKeys: apiKeysReducer,
+};
+
+const persistedRootReducer = persistReducer(persistConfig, (state: any, action: any) => ({
+  widgets: widgetsReducer(state?.widgets, action),
+  apiKeys: apiKeysReducer(state?.apiKeys, action),
+}));
 
 export const store = configureStore({
-  reducer: {
-    widgets: persistedWidgetsReducer,
-  },
+  reducer: persistedRootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {

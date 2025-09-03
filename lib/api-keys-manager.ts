@@ -6,10 +6,10 @@ interface ApiKey {
   name: string;
   key: string;
   provider?: 'finnhub';
-  createdAt: Date;
-  lastUsed?: Date;
+  createdAt: string;
+  lastUsed?: string;
   isValid?: boolean;
-  lastTested?: Date;
+  usageCount?: number;
 }
 
 export class ApiKeysManager {
@@ -30,7 +30,7 @@ export class ApiKeysManager {
       name,
       key,
       provider,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     };
 
     apiKeys.push(newApiKey);
@@ -131,7 +131,7 @@ export class ApiKeysManager {
    * @param id The ID of the API key that was used
    */
   static recordKeyUsage(id: string): void {
-    this.updateApiKey(id, { lastUsed: new Date() });
+    this.updateApiKey(id, { lastUsed: new Date().toISOString() });
   }
 
   /**
@@ -140,7 +140,7 @@ export class ApiKeysManager {
    * @param isValid Whether the API key is valid
    */
   static updateKeyValidation(id: string, isValid: boolean): void {
-    this.updateApiKey(id, { isValid, lastTested: new Date() });
+    this.updateApiKey(id, { isValid });
   }
 
   /**

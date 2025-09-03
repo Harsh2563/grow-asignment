@@ -19,8 +19,11 @@ interface ApiKey {
   id: string;
   name: string;
   key: string;
-  createdAt: Date;
-  lastUsed?: Date;
+  provider?: "finnhub";
+  createdAt: string;
+  lastUsed?: string;
+  isValid?: boolean;
+  usageCount?: number;
 }
 
 interface ApiKeySelectorProps {

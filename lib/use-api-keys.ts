@@ -1,75 +1,113 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ApiKeysManager } from "@/lib/api-keys-manager";
-
-interface ApiKey {
-  id: string;
-  name: string;
-  key: string;
-  provider?: 'finnhub';
-  createdAt: Date;
-  lastUsed?: Date;
-}
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import {
+  addApiKey as addApiKeyAction,
+  updateApiKey as updateApiKeyAction,
+  deleteApiKey as deleteApiKeyAction,
+  recordKeyUsage as recordKeyUsageAction,
+  updateKeyValidation,
+  setApiKeys,
+  setSelectedApiKey,
+  clearSelectedApiKey,
+  type ApiKey,
+} from "@/store/slices/apiKeysSlice";
+import { useEffect } from "react";
 
 export function useApiKeys() {
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const apiKeys = useAppSelector((state) => state.apiKeys.apiKeys);
+  const selectedApiKeyId = useAppSelector(
+    (state) => state.apiKeys.selectedApiKeyId
+  );
 
   useEffect(() => {
-    loadApiKeys();
-  }, []);
-
-  const loadApiKeys = () => {
-    setIsLoading(true);
-    try {
-      const keys = ApiKeysManager.getApiKeys();
-      setApiKeys(keys);
-    } catch (error) {
-      console.error("Error loading API keys:", error);
-    } finally {
-      setIsLoading(false);
+    if (!selectedApiKeyId && apiKeys.length > 0) {
+      const firstValidKey = apiKeys.find((key) => key.isValid === true);
+      if (firstValidKey) {
+        dispatch(setSelectedApiKey(firstValidKey.id));
+      }
     }
-  };
+  }, [dispatch, selectedApiKeyId, apiKeys]);
 
-  const addApiKey = (name: string, key: string, provider?: 'finnhub') => {
-    const newKey = ApiKeysManager.addApiKey(name, key, provider);
-    loadApiKeys();
-    return newKey;
+  const addApiKey = (name: string, key: string, provider?: "finnhub") => {
+    const newKey = {
+      name,
+      key,
+      provider,
+    };
+    dispatch(addApiKeyAction(newKey));
+
+    return { name, key, provider };
   };
 
   const getApiKeyByName = (name: string) => {
-    return ApiKeysManager.getApiKeyByName(name);
+    return apiKeys.find((key) => key.name === name) || null;
+  };
+
+  const getApiKeyById = (id: string) => {
+    return apiKeys.find((key) => key.id === id) || null;
   };
 
   const updateApiKey = (
     id: string,
     updates: Partial<Omit<ApiKey, "id" | "createdAt">>
   ) => {
-    const updatedKey = ApiKeysManager.updateApiKey(id, updates);
-    loadApiKeys();
-    return updatedKey;
+    dispatch(updateApiKeyAction({ id, updates }));
+    const updatedKey = apiKeys.find((key) => key.id === id);
+    return updatedKey || null;
   };
 
   const deleteApiKey = (id: string) => {
-    const result = ApiKeysManager.deleteApiKey(id);
-    loadApiKeys();
-    return result;
+    dispatch(deleteApiKeyAction(id));
+    return true;
   };
 
   const recordKeyUsage = (id: string) => {
-    ApiKeysManager.recordKeyUsage(id);
-    loadApiKeys();
+    dispatch(recordKeyUsageAction(id));
+  };
+
+  const updateKeyValidationStatus = (id: string, isValid: boolean) => {
+    dispatch(updateKeyValidation({ id, isValid }));
+  };
+
+  const getValidApiKeys = () => {
+    return apiKeys.filter((key) => key.isValid === true);
+  };
+
+  const getUntestedApiKeys = () => {
+    return apiKeys.filter((key) => key.isValid === undefined);
+  };
+
+  const getSelectedApiKey = () => {
+    if (!selectedApiKeyId) return null;
+    return apiKeys.find((key) => key.id === selectedApiKeyId) || null;
+  };
+
+  const selectApiKey = (id: string) => {
+    dispatch(setSelectedApiKey(id));
+  };
+
+  const clearSelection = () => {
+    dispatch(clearSelectedApiKey());
   };
 
   return {
     apiKeys,
-    isLoading,
+    selectedApiKeyId,
+    isLoading: false,
     addApiKey,
     getApiKeyByName,
+    getApiKeyById,
     updateApiKey,
     deleteApiKey,
     recordKeyUsage,
-    refreshApiKeys: loadApiKeys,
+    updateKeyValidationStatus,
+    getValidApiKeys,
+    getUntestedApiKeys,
+    getSelectedApiKey,
+    selectApiKey,
+    clearSelection,
+    refreshApiKeys: () => {},
   };
 }

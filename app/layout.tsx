@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { FinanceLogo } from "@/components/svgs";
 import { NewWidgetDialog } from "@/components/new-widget-dialog";
+import { ReduxProvider } from "@/components/redux-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,26 +35,28 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <header className="flex justify-between items-center px-6 py-4 border-b border-border bg-card/50">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-white font-bold">
-                <FinanceLogo />
+        <ReduxProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <header className="flex justify-between items-center px-6 py-4 border-b border-border bg-card/50">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-white font-bold">
+                  <FinanceLogo />
+                </div>
+                <h1 className={`text-lg font-bold`}>Finance Dashboard</h1>
               </div>
-              <h1 className={`text-lg font-bold`}>Finance Dashboard</h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <NewWidgetDialog />
-              <ThemeToggle />
-            </div>
-          </header>
-          {children}
-        </ThemeProvider>
+              <div className="flex items-center gap-4">
+                <NewWidgetDialog />
+                <ThemeToggle />
+              </div>
+            </header>
+            {children}
+          </ThemeProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

@@ -17,8 +17,11 @@ import { useApiKeys } from "@/lib/use-api-keys";
 import { ApiKeySelector } from "@/components/api-key-selector";
 import { WidgetFormFields } from "@/components/widget-form-fields";
 import { AddApiKeyDialog } from "@/components/add-api-key-dialog";
+import { useAppDispatch } from "@/store/hooks";
+import { addWidget } from "@/store/slices/widgetsSlice";
 
 export const NewWidgetDialog = () => {
+  const dispatch = useAppDispatch();
   const [isWidgetDialogOpen, setIsWidgetDialogOpen] = useState(false);
   const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
   const [widgetName, setWidgetName] = useState("");
@@ -35,38 +38,46 @@ export const NewWidgetDialog = () => {
 
   const handleAddWidget = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (!widgetName.trim()) {
       setErrorMessage("Widget name is required");
       return;
     }
-    
+
     if (!widgetType) {
       setErrorMessage("Please select a widget type");
       return;
     }
-    
+
     if (!stockSymbol.trim()) {
       setErrorMessage("Stock symbol is required");
       return;
     }
-    
+
     if (!selectedApiKeyId) {
       setErrorMessage("Please select an API key");
       return;
     }
-    
-    // Here you would save the widget configuration
-    console.log("Widget configuration:", {
+
+    // Create widget and save to Redux store
+    const newWidget = {
       name: widgetName,
-      type: widgetType,
-      symbol: stockSymbol,
-      chartType: widgetType === 'chart' ? chartType : undefined,
+      type: widgetType as "table" | "card" | "chart",
+      stockSymbol: stockSymbol,
+      chartType:
+        widgetType === "chart"
+          ? (chartType as "line" | "candlestick")
+          : undefined,
+      cardType: widgetType === "card" ? ("watchlist" as const) : undefined,
       refreshInterval: parseInt(refreshInterval),
-      apiKeyId: selectedApiKeyId
-    });
-    
+      apiKeyId: selectedApiKeyId,
+      isVisible: true,
+    };
+
+    // Dispatch to Redux store
+    dispatch(addWidget(newWidget));
+
     // Reset form
     setWidgetName("");
     setWidgetType("");
@@ -127,7 +138,8 @@ export const NewWidgetDialog = () => {
           <DialogHeader>
             <DialogTitle>Add New Widget</DialogTitle>
             <DialogDescription>
-              Create a new financial widget to display real-time stock data on your dashboard.
+              Create a new financial widget to display real-time stock data on
+              your dashboard.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddWidget}>

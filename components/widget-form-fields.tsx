@@ -62,17 +62,33 @@ export const WidgetFormFields = ({
         </select>
       </div>
 
-      {/* Stock Symbol */}
+      {/* Stock Symbol - Disabled for table widgets */}
       <div className="grid gap-3">
         <Label htmlFor="stock-symbol">Stock Symbol</Label>
-        <Input
-          id="stock-symbol"
-          name="stock-symbol"
-          placeholder="e.g., AAPL, GOOGL, TSLA"
-          value={stockSymbol}
-          onChange={(e) => onStockSymbolChange(e.target.value.toUpperCase())}
-          required
-        />
+        {widgetType === 'table' ? (
+          <div className="space-y-2">
+            <Input
+              id="stock-symbol"
+              name="stock-symbol"
+              placeholder="Multiple stocks will be displayed"
+              value="Multiple stocks (AAPL, GOOGL, MSFT, AMZN, TSLA, META, NVDA, NFLX)"
+              disabled
+              className="opacity-60"
+            />
+            <p className="text-xs text-muted-foreground">
+              Table widgets display multiple predefined stocks automatically
+            </p>
+          </div>
+        ) : (
+          <Input
+            id="stock-symbol"
+            name="stock-symbol"
+            placeholder="e.g., AAPL, GOOGL, TSLA"
+            value={stockSymbol}
+            onChange={(e) => onStockSymbolChange(e.target.value.toUpperCase())}
+            required
+          />
+        )}
       </div>
 
       {/* Chart Type - Only show for chart widgets */}

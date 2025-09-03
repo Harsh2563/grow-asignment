@@ -50,7 +50,7 @@ export const NewWidgetDialog = () => {
       return;
     }
 
-    if (!stockSymbol.trim()) {
+    if (widgetType !== "table" && !stockSymbol.trim()) {
       setErrorMessage("Stock symbol is required");
       return;
     }
@@ -64,7 +64,7 @@ export const NewWidgetDialog = () => {
     const newWidget = {
       name: widgetName,
       type: widgetType as "table" | "card" | "chart",
-      stockSymbol: stockSymbol,
+      stockSymbol: widgetType === "table" ? "" : stockSymbol, // Empty for table widgets
       chartType:
         widgetType === "chart"
           ? (chartType as "line" | "candlestick")

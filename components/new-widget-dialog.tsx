@@ -22,20 +22,59 @@ export const NewWidgetDialog = () => {
   const [isWidgetDialogOpen, setIsWidgetDialogOpen] = useState(false);
   const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
   const [widgetName, setWidgetName] = useState("");
-  const [apiUrl, setApiUrl] = useState("");
+  const [widgetType, setWidgetType] = useState("");
+  const [stockSymbol, setStockSymbol] = useState("");
+  const [chartType, setChartType] = useState("");
   const [refreshInterval, setRefreshInterval] = useState("60");
   const [selectedApiKeyId, setSelectedApiKeyId] = useState<string | null>(null);
   const [newKeyName, setNewKeyName] = useState("");
   const [newKeyValue, setNewKeyValue] = useState("");
+  const [newKeyProvider, setNewKeyProvider] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const { apiKeys, addApiKey } = useApiKeys();
 
   const handleAddWidget = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!widgetName.trim()) {
+      setErrorMessage("Widget name is required");
+      return;
+    }
+    
+    if (!widgetType) {
+      setErrorMessage("Please select a widget type");
+      return;
+    }
+    
+    if (!stockSymbol.trim()) {
+      setErrorMessage("Stock symbol is required");
+      return;
+    }
+    
+    if (!selectedApiKeyId) {
+      setErrorMessage("Please select an API key");
+      return;
+    }
+    
+    // Here you would save the widget configuration
+    console.log("Widget configuration:", {
+      name: widgetName,
+      type: widgetType,
+      symbol: stockSymbol,
+      chartType: widgetType === 'chart' ? chartType : undefined,
+      refreshInterval: parseInt(refreshInterval),
+      apiKeyId: selectedApiKeyId
+    });
+    
+    // Reset form
     setWidgetName("");
-    setApiUrl("");
+    setWidgetType("");
+    setStockSymbol("");
+    setChartType("");
     setRefreshInterval("60");
     setSelectedApiKeyId(null);
+    setErrorMessage("");
     setIsWidgetDialogOpen(false);
   };
 
@@ -55,6 +94,7 @@ export const NewWidgetDialog = () => {
 
     setNewKeyName("");
     setNewKeyValue("");
+    setNewKeyProvider("");
     setErrorMessage("");
     setIsApiKeyDialogOpen(false);
     setIsWidgetDialogOpen(true);
@@ -63,6 +103,7 @@ export const NewWidgetDialog = () => {
   const handleCancelAddKey = () => {
     setNewKeyName("");
     setNewKeyValue("");
+    setNewKeyProvider("");
     setErrorMessage("");
     setIsApiKeyDialogOpen(false);
     setIsWidgetDialogOpen(true);
@@ -82,22 +123,33 @@ export const NewWidgetDialog = () => {
             <PlusIcon className="h-4 w-4 mr-1.5" /> Add Widget
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add New Widget</DialogTitle>
             <DialogDescription>
-              Configure your new data widget with the required API details.
+              Create a new financial widget to display real-time stock data on your dashboard.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddWidget}>
             <div className="grid gap-4 py-4">
+              {/* Error Message */}
+              {errorMessage && (
+                <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
+                  {errorMessage}
+                </div>
+              )}
+
               {/* Widget Form Fields */}
               <WidgetFormFields
                 widgetName={widgetName}
-                apiUrl={apiUrl}
+                widgetType={widgetType}
+                stockSymbol={stockSymbol}
+                chartType={chartType}
                 refreshInterval={refreshInterval}
                 onWidgetNameChange={setWidgetName}
-                onApiUrlChange={setApiUrl}
+                onWidgetTypeChange={setWidgetType}
+                onStockSymbolChange={setStockSymbol}
+                onChartTypeChange={setChartType}
                 onRefreshIntervalChange={setRefreshInterval}
               />
 
@@ -142,9 +194,11 @@ export const NewWidgetDialog = () => {
         }}
         keyName={newKeyName}
         keyValue={newKeyValue}
+        provider={newKeyProvider}
         errorMessage={errorMessage}
         onKeyNameChange={setNewKeyName}
         onKeyValueChange={setNewKeyValue}
+        onProviderChange={setNewKeyProvider}
         onSubmit={handleAddNewKey}
         onCancel={handleCancelAddKey}
       />

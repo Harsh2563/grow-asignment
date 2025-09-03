@@ -3,8 +3,6 @@ import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle-new";
-import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
 import { FinanceLogo } from "@/components/svgs";
 import { NewWidgetDialog } from "@/components/new-widget-dialog";
 import { ReduxProvider } from "@/components/redux-provider";

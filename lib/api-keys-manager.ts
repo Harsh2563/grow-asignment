@@ -5,7 +5,7 @@ interface ApiKey {
   id: string;
   name: string;
   key: string;
-  provider?: 'alphavantage' | 'twelvedata' | 'finnhub';
+  provider?: 'finnhub';
   createdAt: Date;
   lastUsed?: Date;
   isValid?: boolean;
@@ -22,7 +22,7 @@ export class ApiKeysManager {
    * @param provider The financial data provider (optional)
    * @returns The newly created API key object
    */
-  static addApiKey(name: string, key: string, provider?: 'alphavantage' | 'twelvedata' | 'finnhub'): ApiKey {
+  static addApiKey(name: string, key: string, provider?: 'finnhub'): ApiKey {
     const apiKeys = this.getApiKeys();
 
     const newApiKey: ApiKey = {

@@ -7,6 +7,7 @@ interface ApiKey {
   id: string;
   name: string;
   key: string;
+  provider?: 'finnhub';
   createdAt: Date;
   lastUsed?: Date;
 }
@@ -31,8 +32,8 @@ export function useApiKeys() {
     }
   };
 
-  const addApiKey = (name: string, key: string) => {
-    const newKey = ApiKeysManager.addApiKey(name, key);
+  const addApiKey = (name: string, key: string, provider?: 'finnhub') => {
+    const newKey = ApiKeysManager.addApiKey(name, key, provider);
     loadApiKeys();
     return newKey;
   };

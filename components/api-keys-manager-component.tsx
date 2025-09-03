@@ -14,7 +14,7 @@ interface ApiKey {
   id: string;
   name: string;
   key: string;
-  provider?: 'alphavantage' | 'twelvedata' | 'finnhub';
+  provider?: 'finnhub';
   createdAt: Date;
   lastUsed?: Date;
 }
@@ -24,7 +24,7 @@ export const ApiKeysManagerComponent = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [newKeyValue, setNewKeyValue] = useState("");
-  const [newKeyProvider, setNewKeyProvider] = useState("");
+  const [newKeyProvider, setNewKeyProvider] = useState("finnhub");
   const [errorMessage, setErrorMessage] = useState("");
   const [isTestingKey, setIsTestingKey] = useState(false);
 
@@ -40,11 +40,6 @@ export const ApiKeysManagerComponent = () => {
   const handleAddKey = async () => {
     // Clear previous error
     setErrorMessage("");
-    
-    if (!newKeyProvider) {
-      setErrorMessage("Please select a provider");
-      return;
-    }
 
     // Validate inputs
     if (!newKeyName.trim()) {
@@ -66,7 +61,7 @@ export const ApiKeysManagerComponent = () => {
     // Test the API key before saving
     setIsTestingKey(true);
     try {
-      const testResult = await testApiKey(newKeyValue, newKeyProvider as 'alphavantage' | 'twelvedata' | 'finnhub');
+      const testResult = await testApiKey(newKeyValue);
       
       if (!testResult.success) {
         setErrorMessage(`API Key validation failed: ${testResult.message || 'The API key is not working properly'}`);
@@ -74,7 +69,7 @@ export const ApiKeysManagerComponent = () => {
       }
 
       // If validation passes, save the key
-      ApiKeysManager.addApiKey(newKeyName, newKeyValue, newKeyProvider as 'alphavantage' | 'twelvedata' | 'finnhub');
+      ApiKeysManager.addApiKey(newKeyName, newKeyValue, 'finnhub');
       handleCancelAddKey();
       loadApiKeys();
       
@@ -89,7 +84,7 @@ export const ApiKeysManagerComponent = () => {
   const handleCancelAddKey = () => {
     setNewKeyName("");
     setNewKeyValue("");
-    setNewKeyProvider("");
+    setNewKeyProvider("finnhub");
     setErrorMessage("");
     setIsAddDialogOpen(false);
   };

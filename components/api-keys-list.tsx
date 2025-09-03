@@ -7,7 +7,7 @@ interface ApiKey {
   id: string;
   name: string;
   key: string;
-  provider?: "alphavantage" | "twelvedata" | "finnhub";
+  provider?: "finnhub";
   createdAt: Date;
   lastUsed?: Date;
 }
@@ -25,19 +25,6 @@ export const ApiKeysList = ({ apiKeys, onDeleteApiKey }: ApiKeysListProps) => {
     return `${key.substring(0, 4)}${"•".repeat(key.length - 8)}${key.substring(
       key.length - 4
     )}`;
-  };
-
-  const getProviderDisplayName = (provider?: string): string => {
-    switch (provider) {
-      case "alphavantage":
-        return "Alpha Vantage";
-      case "twelvedata":
-        return "Twelve Data";
-      case "finnhub":
-        return "Finnhub";
-      default:
-        return "Unknown Provider";
-    }
   };
 
   return (

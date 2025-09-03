@@ -20,11 +20,9 @@ interface NewApiKeyFormProps {
 export const NewApiKeyForm = ({
   keyName,
   keyValue,
-  provider,
   isLoading = false,
   onKeyNameChange,
   onKeyValueChange,
-  onProviderChange,
   onCancel,
   onSave,
 }: NewApiKeyFormProps) => {
@@ -32,18 +30,10 @@ export const NewApiKeyForm = ({
     <div className="grid gap-4 w-full">
       <div className="grid gap-2">
         <Label htmlFor="provider">Provider</Label>
-        <select
-          id="provider"
-          value={provider}
-          onChange={(e) => onProviderChange(e.target.value)}
-          disabled={isLoading}
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <option value="">Select a provider</option>
-          <option value="alphavantage">Alpha Vantage</option>
-          <option value="twelvedata">Twelve Data</option>
-          <option value="finnhub">Finnhub</option>
-        </select>
+        <div className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background items-center">
+          <span className="text-foreground">Finnhub</span>
+        </div>
+        <input type="hidden" value="finnhub" />
       </div>
       <div className="grid gap-2">
         <Label htmlFor="new-key-name">API Key Name</Label>
@@ -79,7 +69,7 @@ export const NewApiKeyForm = ({
           type="button"
           onClick={onSave}
           disabled={
-            isLoading || !keyName.trim() || !keyValue.trim() || !provider
+            isLoading || !keyName.trim() || !keyValue.trim()
           }
         >
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

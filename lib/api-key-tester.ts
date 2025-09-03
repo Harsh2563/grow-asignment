@@ -3,14 +3,14 @@
 
 export interface TestApiKeyRequest {
   apiKey: string;
-  provider?: "alphavantage" | "twelvedata" | "finnhub";
+  provider?: "finnhub";
 }
 
 export interface TestApiKeyResponse {
   success: boolean;
   message: string;
   provider?: string;
-  data?: any;
+  data?: unknown;
 }
 
 /**
@@ -20,8 +20,7 @@ export interface TestApiKeyResponse {
  * @returns Promise with test results
  */
 export async function testApiKey(
-  apiKey: string,
-  provider: "alphavantage" | "twelvedata" | "finnhub" = "alphavantage"
+  apiKey: string
 ): Promise<TestApiKeyResponse> {
   try {
     const response = await fetch("/api/test-api-key", {
@@ -31,7 +30,7 @@ export async function testApiKey(
       },
       body: JSON.stringify({
         apiKey,
-        provider,
+        provider: "finnhub",
       } as TestApiKeyRequest),
     });
 
@@ -43,7 +42,7 @@ export async function testApiKey(
       message: `Network error: ${
         error instanceof Error ? error.message : "Unknown error"
       }`,
-      provider,
+      provider: "finnhub",
     };
   }
 }
@@ -57,12 +56,12 @@ export async function testMultipleApiKeys(
   apiKeys: Array<{
     id: string;
     key: string;
-    provider?: "alphavantage" | "twelvedata" | "finnhub";
+    provider?: "finnhub";
   }>
 ): Promise<Array<{ id: string; result: TestApiKeyResponse }>> {
-  const promises = apiKeys.map(async ({ id, key, provider }) => ({
+  const promises = apiKeys.map(async ({ id, key }) => ({
     id,
-    result: await testApiKey(key, provider),
+    result: await testApiKey(key),
   }));
 
   return Promise.all(promises);
@@ -73,25 +72,12 @@ export async function testMultipleApiKeys(
  * @returns Array of supported provider names
  */
 export function getSupportedProviders(): Array<{
-  id: "alphavantage" | "twelvedata" | "finnhub";
+  id: "finnhub";
   name: string;
   description: string;
   websiteUrl: string;
 }> {
   return [
-    {
-      id: "alphavantage",
-      name: "Alpha Vantage",
-      description:
-        "Real-time and historical stock data, forex, and crypto data",
-      websiteUrl: "https://www.alphavantage.co/",
-    },
-    {
-      id: "twelvedata",
-      name: "Twelve Data",
-      description: "Stock market data API with real-time and historical data",
-      websiteUrl: "https://twelvedata.com/",
-    },
     {
       id: "finnhub",
       name: "Finnhub",
@@ -108,8 +94,7 @@ export function getSupportedProviders(): Array<{
  * @returns Object with validation result and message
  */
 export function validateApiKeyFormat(
-  apiKey: string,
-  provider: "alphavantage" | "twelvedata" | "finnhub"
+  apiKey: string
 ): { isValid: boolean; message: string } {
   if (!apiKey || apiKey.trim().length === 0) {
     return {
@@ -120,44 +105,12 @@ export function validateApiKeyFormat(
 
   const trimmedKey = apiKey.trim();
 
-  switch (provider) {
-    case "alphavantage":
-      // Alpha Vantage keys are typically alphanumeric, 16 characters
-      if (!/^[A-Za-z0-9]{10,20}$/.test(trimmedKey)) {
-        return {
-          isValid: false,
-          message:
-            "Alpha Vantage API keys should be 10-20 alphanumeric characters",
-        };
-      }
-      break;
-
-    case "twelvedata":
-      // Twelve Data keys are typically longer alphanumeric strings
-      if (!/^[A-Za-z0-9]{20,40}$/.test(trimmedKey)) {
-        return {
-          isValid: false,
-          message:
-            "Twelve Data API keys should be 20-40 alphanumeric characters",
-        };
-      }
-      break;
-
-    case "finnhub":
-      // Finnhub keys are typically 20 characters, alphanumeric
-      if (!/^[A-Za-z0-9]{15,25}$/.test(trimmedKey)) {
-        return {
-          isValid: false,
-          message: "Finnhub API keys should be 15-25 alphanumeric characters",
-        };
-      }
-      break;
-
-    default:
-      return {
-        isValid: false,
-        message: "Unsupported provider",
-      };
+  // Finnhub keys are typically 20 characters, alphanumeric
+  if (!/^[A-Za-z0-9]{15,25}$/.test(trimmedKey)) {
+    return {
+      isValid: false,
+      message: "Finnhub API keys should be 15-25 alphanumeric characters",
+    };
   }
 
   return {

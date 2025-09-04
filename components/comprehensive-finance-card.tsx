@@ -1,8 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAppSelector } from "@/store/hooks";
-import { Widget } from "@/store/slices/widgetsSlice";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   TrendingUp,
@@ -21,13 +18,8 @@ import {
   formatCurrency,
   formatPercentage,
 } from "@/lib/finance-api";
-import {
-  useStockData,
-  useMarketMovers,
-  useStockPerformance,
-  useInvalidateQueries,
-  useAutoRefresh,
-} from "@/lib/use-finance-queries";
+import { Widget } from "@/store/slices/widgetsSlice";
+import { useComprehensiveFinanceCard } from "@/lib/use-comprehensive-finance-card";
 
 interface ComprehensiveFinanceCardProps {
   widget: Widget;
@@ -36,76 +28,53 @@ interface ComprehensiveFinanceCardProps {
 export const ComprehensiveFinanceCard = ({
   widget,
 }: ComprehensiveFinanceCardProps) => {
-  const [activeTab, setActiveTab] = useState<"main" | "movers" | "performance">(
-    "main"
-  );
-
-  const apiKeys = useAppSelector((state) => state.apiKeys.apiKeys);
-  const selectedApiKey = apiKeys.find((key) => key.id === widget.apiKeyId);
-
   const {
-    data: mainStockData,
-    isLoading: isLoadingStock,
-    error: stockError,
-    refetch: refetchStock,
-  } = useStockData(widget.stockSymbol || "", selectedApiKey || null);
+    // Tab management
+    activeTab,
+    setActiveTab,
 
-  const {
-    data: marketMovers,
-    isLoading: isLoadingMovers,
-    error: moversError,
-    refetch: refetchMovers,
-  } = useMarketMovers(selectedApiKey || null);
-
-  const {
-    data: performanceData,
-    isLoading: isLoadingPerformance,
-    error: performanceError,
-    refetch: refetchPerformance,
-  } = useStockPerformance(widget.stockSymbol || "", selectedApiKey || null);
-
-  const { invalidateStock, invalidateMarketMovers, invalidatePerformance } =
-    useInvalidateQueries();
-
-  // Use auto-refresh hook for reliable data updates
-  useAutoRefresh(widget.refreshInterval, selectedApiKey?.id || "");
+    // Data states
+    mainStockData,
+    marketMovers,
+    performanceData,
+    currentTabData,
+    
+    // Loading states
+    loading,
+    isLoadingStock,
+    isLoadingMovers,
+    isLoadingPerformance,
+    
+    // Error states
+    error,
+    stockError,
+    moversError,
+    performanceError,
+    
+    // API key
+    selectedApiKey,
+    
+    // Actions
+    refetchCurrentTab,
+    invalidateCurrentTab,
+  } = useComprehensiveFinanceCard(widget);
 
   const handleRefresh = async () => {
     if (!selectedApiKey) return;
 
     try {
-      // First invalidate all relevant queries to clear cache
-      if (widget.stockSymbol) {
-        invalidateStock(widget.stockSymbol, selectedApiKey.id);
-        invalidatePerformance(widget.stockSymbol, selectedApiKey.id);
-      }
-      invalidateMarketMovers(selectedApiKey.id);
-
+      // Invalidate cache and refetch current tab data
+      invalidateCurrentTab();
+      
       // Wait a moment for cache invalidation to complete
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Then refetch data based on current active tab
-      const refetchPromises = [];
-
-      if (activeTab === "main" || activeTab === "performance") {
-        refetchPromises.push(refetchStock());
-      }
-      if (activeTab === "movers") {
-        refetchPromises.push(refetchMovers());
-      }
-      if (activeTab === "performance") {
-        refetchPromises.push(refetchPerformance());
-      }
-
-      // Wait for all refetches to complete
-      await Promise.all(refetchPromises);
+      // Refetch current tab data
+      refetchCurrentTab();
     } catch (error) {
       console.error("Failed to refresh data:", error);
     }
   };
-
-  const loading = isLoadingStock || isLoadingMovers || isLoadingPerformance;
-  const error = stockError || moversError || performanceError;
 
   if (!widget.isVisible) return null;
 

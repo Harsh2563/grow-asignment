@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
 import { useAppSelector } from "@/store/hooks";
 import { Widget } from "@/store/slices/widgetsSlice";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,141 +30,49 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  StockData,
   calculateStockChange,
   formatCurrency,
   formatPercentage,
 } from "@/lib/finance-api";
-import {
-  usePopularStocks,
-  useStockSearch,
-  useInvalidateQueries,
-  useAutoRefresh,
-} from "@/lib/use-finance-queries";
+import { useFinanceTableWidget } from "@/lib/use-finance-table-widget";
 
 interface TableWidgetProps {
   widget: Widget;
 }
 
 export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchedStocks, setSearchedStocks] = useState<Set<string>>(new Set());
-  const [searchedStocksData, setSearchedStocksData] = useState<StockData[]>([]);
-  const [shouldSearch, setShouldSearch] = useState(false);
-  const [currentSearchTerm, setCurrentSearchTerm] = useState("");
-
-  const ITEMS_PER_PAGE = 5;
-
   const apiKeys = useAppSelector((state) => state.apiKeys.apiKeys);
   const selectedApiKey = apiKeys.find((key) => key.id === widget.apiKeyId);
 
   const {
-    data: popularData,
-    isLoading: isLoadingPopular,
-    error: popularError,
-    refetch: refetchPopular,
-  } = usePopularStocks(selectedApiKey || null);
-
-  const {
-    data: searchResult,
-    isLoading: isSearching,
-    error: searchError,
-  } = useStockSearch(currentSearchTerm, selectedApiKey || null, shouldSearch);
-
-  const { invalidatePopularStocks } = useInvalidateQueries();
-
-  // Use auto-refresh hook for reliable data updates
-  useAutoRefresh(widget.refreshInterval, selectedApiKey?.id || "");
-
-  // Combine popular stocks and searched stocks
-  const stocksData = useMemo(() => {
-    const popularStocks = popularData?.stocksData || [];
-    const combinedStocks = [...popularStocks, ...searchedStocksData];
-
-    const uniqueStocks = combinedStocks.reduce((acc, stock) => {
-      const existingIndex = acc.findIndex((s) => s.symbol === stock.symbol);
-      if (existingIndex >= 0) {
-        // Replace with the more recent data (searched stocks take priority)
-        if (searchedStocksData.some((s) => s.symbol === stock.symbol)) {
-          acc[existingIndex] = stock;
-        }
-      } else {
-        acc.push(stock);
-      }
-      return acc;
-    }, [] as StockData[]);
-
-    return uniqueStocks;
-  }, [popularData?.stocksData, searchedStocksData]);
-
-  const loading = isLoadingPopular && searchedStocksData.length === 0;
-  const error = popularError || searchError;
-
-  useEffect(() => {
-    if (searchResult && shouldSearch) {
-      setSearchedStocksData((prev) => {
-        const filtered = prev.filter(
-          (stock) => stock.symbol !== searchResult.symbol
-        );
-        return [...filtered, searchResult];
-      });
-      setSearchedStocks(
-        (prev) => new Set([...prev, currentSearchTerm.toUpperCase()])
-      );
-      setShouldSearch(false);
-      setCurrentSearchTerm("");
-    }
-  }, [searchResult, shouldSearch, currentSearchTerm]);
-
-  const searchAndAddStock = async (symbol: string): Promise<void> => {
-    if (!selectedApiKey || searchedStocks.has(symbol.toUpperCase())) {
-      return;
-    }
-
-    setCurrentSearchTerm(symbol.toUpperCase());
-    setShouldSearch(true);
-  };
-
-  const handleSearchClick = async () => {
-    const trimmedQuery = searchQuery.trim().toUpperCase();
-    if (trimmedQuery.length >= 1) {
-      await searchAndAddStock(trimmedQuery);
-    }
-  };
-
-  const handleSearchKeyPress = (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (event.key === "Enter") {
-      handleSearchClick();
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-    setCurrentPage(1);
-  };
-
-  const filteredStocks = useMemo(() => {
-    if (!searchQuery) {
-      return stocksData;
-    }
-
-    const query = searchQuery.toLowerCase();
-    return stocksData.filter((stock) =>
-      stock.symbol.toLowerCase().includes(query)
-    );
-  }, [stocksData, searchQuery]);
-
-  const totalPages = Math.ceil(filteredStocks.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentStocks = filteredStocks.slice(startIndex, endIndex);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
+    // Search states
+    searchQuery,
+    setSearchQuery,
+    searchedStocks,
+    
+    // Pagination states
+    currentPage,
+    totalPages,
+    currentStocks,
+    
+    // Data states
+    stocksData,
+    loading,
+    error,
+    
+    // Handlers
+    handleSearch,
+    handleRemoveSearchedStock,
+    handleClearSearch,
+    handlePageChange,
+    
+    // Data refetch
+    refetchPopular,
+    invalidatePopularStocks,
+    
+    // Constants
+    ITEMS_PER_PAGE,
+  } = useFinanceTableWidget(selectedApiKey, widget.refreshInterval);
 
   if (!widget.isVisible) return null;
 
@@ -178,9 +85,7 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
           </CardTitle>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {loading && <RefreshCw className="h-4 w-4 animate-spin" />}
-            {popularData && (
-              <span>Updated: {new Date().toLocaleTimeString()}</span>
-            )}
+            <span>Updated: {new Date().toLocaleTimeString()}</span>
           </div>
         </div>
       </CardHeader>
@@ -188,32 +93,45 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
         {loading && stocksData.length === 0 ? (
           <div className="flex items-center justify-center py-8">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-muted-foreground">
-              Loading stocks data...
-            </span>
+            <span className="ml-2 text-muted-foreground">Loading stocks...</span>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center py-8 text-destructive">
             <AlertCircle className="h-8 w-8 mr-2" />
-            <span>{error?.message || "An error occurred"}</span>
+            <div className="text-center">
+              <p className="font-medium">Failed to load stock data</p>
+              <p className="text-sm mt-1">{error?.message}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetchPopular()}
+                className="mt-2"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Retry
+              </Button>
+            </div>
           </div>
-        ) : stocksData.length > 0 ? (
-          <div className="space-y-4">
+        ) : (
+          <>
             {/* Search Bar */}
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2 mb-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Enter stock symbol (e.g., AAPL, GOOGL, TSLA)"
+                  placeholder="Search stocks or filter results..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleSearchKeyPress}
-                  className="pl-10 pr-10"
-                  disabled={isSearching}
+                  className="pl-9 pr-9"
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearch();
+                    }
+                  }}
                 />
                 {searchQuery && (
                   <button
-                    onClick={clearSearch}
+                    onClick={handleClearSearch}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     <X className="h-4 w-4" />
@@ -221,130 +139,104 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
                 )}
               </div>
               <Button
-                onClick={handleSearchClick}
-                disabled={!searchQuery.trim() || isSearching}
-                className="min-w-[100px]"
+                onClick={handleSearch}
+                size="sm"
+                disabled={
+                  !searchQuery.trim() ||
+                  searchedStocks.has(searchQuery.trim().toUpperCase()) ||
+                  loading
+                }
+                className="flex-shrink-0"
               >
-                {isSearching ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                    Searching...
-                  </>
-                ) : (
-                  <>
-                    <Search className="h-4 w-4 mr-2" />
-                    Search
-                  </>
-                )}
+                <Search className="h-4 w-4 mr-1" />
+                Add Stock
               </Button>
             </div>
 
-            {/* Search Results Info */}
+            {/* Searched Stocks Pills */}
             {searchedStocks.size > 0 && (
-              <div className="text-sm text-muted-foreground">
-                Searched stocks: {Array.from(searchedStocks).join(", ")}
-                <Button
-                  variant="link"
-                  size="sm"
-                  onClick={() => {
-                    setSearchedStocks(new Set());
-                    setSearchedStocksData([]);
-                    refetchPopular();
-                  }}
-                  className="h-auto p-0 ml-2"
-                >
-                  Reset to popular stocks
-                </Button>
+              <div className="flex flex-wrap gap-1 mb-3">
+                <span className="text-xs text-muted-foreground mr-2">
+                  Added stocks:
+                </span>
+                {Array.from(searchedStocks).map((symbol) => (
+                  <div
+                    key={symbol}
+                    className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs"
+                  >
+                    <span>{symbol}</span>
+                    <button
+                      onClick={() => handleRemoveSearchedStock(symbol)}
+                      className="hover:bg-primary/20 rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
 
-            {/* Stocks Table */}
-            <div className="flex-1 overflow-auto">
+            {/* Table */}
+            <div className="flex-1 overflow-auto border rounded-md">
               <Table>
-                <TableHeader className="sticky top-0 bg-background z-10">
+                <TableHeader>
                   <TableRow>
-                    <TableHead className="font-semibold">Symbol</TableHead>
-                    <TableHead className="font-semibold text-right">
-                      Current Price
-                    </TableHead>
-                    <TableHead className="font-semibold text-right">
-                      Change
-                    </TableHead>
-                    <TableHead className="font-semibold text-right">
-                      Change %
-                    </TableHead>
-                    <TableHead className="font-semibold text-right">
-                      High
-                    </TableHead>
-                    <TableHead className="font-semibold text-right">
-                      Low
-                    </TableHead>
-                    <TableHead className="font-semibold text-right">
-                      Open
-                    </TableHead>
+                    <TableHead className="w-[100px]">Symbol</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="text-right">Price</TableHead>
+                    <TableHead className="text-right">Change</TableHead>
+                    <TableHead className="text-right">Change %</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {currentStocks.length > 0 ? (
+                  {currentStocks.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-8">
+                        <div className="text-muted-foreground">
+                          {searchQuery ? "No stocks found" : "No stock data"}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
                     currentStocks.map((stock) => {
                       const change = calculateStockChange(stock);
+                      const isPositive = change.amount >= 0;
+
                       return (
                         <TableRow key={stock.symbol}>
-                          <TableCell className="font-medium font-mono">
+                          <TableCell className="font-medium">
                             {stock.symbol}
                           </TableCell>
-                          <TableCell className="text-right font-mono">
+                          <TableCell className="max-w-[200px] truncate">
+                            {stock.name || stock.symbol}
+                          </TableCell>
+                          <TableCell className="text-right">
                             {formatCurrency(stock.c)}
                           </TableCell>
                           <TableCell
-                            className={`text-right font-mono ${
-                              change.isPositive
-                                ? "text-green-600"
-                                : "text-red-600"
+                            className={`text-right ${
+                              isPositive ? "text-green-600" : "text-red-600"
                             }`}
                           >
                             <div className="flex items-center justify-end gap-1">
-                              {change.isPositive ? (
-                                <TrendingUp className="h-4 w-4" />
+                              {isPositive ? (
+                                <TrendingUp className="h-3 w-3" />
                               ) : (
-                                <TrendingDown className="h-4 w-4" />
+                                <TrendingDown className="h-3 w-3" />
                               )}
-                              {change.isPositive ? "+" : ""}
-                              {formatCurrency(change.amount)}
+                              {formatCurrency(Math.abs(change.amount))}
                             </div>
                           </TableCell>
                           <TableCell
-                            className={`text-right font-mono ${
-                              change.isPositive
-                                ? "text-green-600"
-                                : "text-red-600"
+                            className={`text-right ${
+                              isPositive ? "text-green-600" : "text-red-600"
                             }`}
                           >
                             {formatPercentage(change.percentage)}
                           </TableCell>
-                          <TableCell className="text-right font-mono">
-                            {formatCurrency(stock.h)}
-                          </TableCell>
-                          <TableCell className="text-right font-mono">
-                            {formatCurrency(stock.l)}
-                          </TableCell>
-                          <TableCell className="text-right font-mono">
-                            {formatCurrency(stock.o)}
-                          </TableCell>
                         </TableRow>
                       );
                     })
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={7}
-                        className="text-center py-8 text-muted-foreground"
-                      >
-                        {searchQuery
-                          ? `No stocks found matching "${searchQuery}"`
-                          : "No stocks available"}
-                      </TableCell>
-                    </TableRow>
                   )}
                 </TableBody>
               </Table>
@@ -352,7 +244,12 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-center">
+              <div className="mt-4 flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{" "}
+                  {Math.min(currentPage * ITEMS_PER_PAGE, stocksData.length)} of{" "}
+                  {stocksData.length} stocks
+                </p>
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
@@ -361,13 +258,13 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
                         onClick={(e) => {
                           e.preventDefault();
                           if (currentPage > 1) {
-                            setCurrentPage(currentPage - 1);
+                            handlePageChange(currentPage - 1);
                           }
                         }}
                         className={
                           currentPage === 1
                             ? "pointer-events-none opacity-50"
-                            : "cursor-pointer"
+                            : ""
                         }
                       />
                     </PaginationItem>
@@ -377,12 +274,11 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
                         <PaginationItem key={page}>
                           <PaginationLink
                             href="#"
+                            isActive={currentPage === page}
                             onClick={(e) => {
                               e.preventDefault();
-                              setCurrentPage(page);
+                              handlePageChange(page);
                             }}
-                            isActive={currentPage === page}
-                            className="cursor-pointer"
                           >
                             {page}
                           </PaginationLink>
@@ -396,13 +292,13 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
                         onClick={(e) => {
                           e.preventDefault();
                           if (currentPage < totalPages) {
-                            setCurrentPage(currentPage + 1);
+                            handlePageChange(currentPage + 1);
                           }
                         }}
                         className={
                           currentPage === totalPages
                             ? "pointer-events-none opacity-50"
-                            : "cursor-pointer"
+                            : ""
                         }
                       />
                     </PaginationItem>
@@ -410,19 +306,7 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
                 </Pagination>
               </div>
             )}
-
-            {/* Stats */}
-            <div className="text-sm text-muted-foreground text-center">
-              Showing {startIndex + 1} to{" "}
-              {Math.min(endIndex, filteredStocks.length)} of{" "}
-              {filteredStocks.length} stocks
-              {searchQuery && ` (filtered from ${stocksData.length} total)`}
-            </div>
-          </div>
-        ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            No stock data available
-          </div>
+          </>
         )}
       </CardContent>
     </Card>

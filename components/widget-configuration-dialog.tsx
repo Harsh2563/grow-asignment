@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,11 +13,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Settings } from "lucide-react";
-import { useApiKeys } from "@/lib/use-api-keys";
 import { ApiKeySelector } from "@/components/api-key-selector";
 import { AddApiKeyDialog } from "@/components/add-api-key-dialog";
-import { useAppDispatch } from "@/store/hooks";
-import { updateWidget, Widget } from "@/store/slices/widgetsSlice";
+import { Widget } from "@/store/slices/widgetsSlice";
+import { useWidgetConfigurationDialog } from "@/lib/use-widget-configuration-dialog";
 
 interface WidgetConfigurationDialogProps {
   widget: Widget;
@@ -29,107 +27,33 @@ interface WidgetConfigurationDialogProps {
 export const WidgetConfigurationDialog: React.FC<
   WidgetConfigurationDialogProps
 > = ({ widget, isOpen, onOpenChange }) => {
-  const dispatch = useAppDispatch();
-  const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
-  const [widgetName, setWidgetName] = useState("");
-  const [refreshInterval, setRefreshInterval] = useState("60");
-  const [selectedApiKeyId, setSelectedApiKeyId] = useState<string | null>(null);
-  const [newKeyName, setNewKeyName] = useState("");
-  const [newKeyValue, setNewKeyValue] = useState("");
-  const [newKeyProvider, setNewKeyProvider] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const { apiKeys, addApiKey } = useApiKeys();
+  const {
+    // States
+    isApiKeyDialogOpen,
+    widgetName,
+    setWidgetName,
+    refreshInterval,
+    setRefreshInterval,
+    selectedApiKeyId,
+    setSelectedApiKeyId,
+    newKeyName,
+    setNewKeyName,
+    newKeyValue,
+    setNewKeyValue,
+    newKeyProvider,
+    setNewKeyProvider,
+    errorMessage,
+    apiKeys,
+    selectedApiKey,
+    refreshIntervalOptions,
 
-  // Initialize form values when widget changes or dialog opens
-  useEffect(() => {
-    if (widget && isOpen) {
-      setWidgetName(widget.name);
-      setRefreshInterval(widget.refreshInterval.toString());
-      setSelectedApiKeyId(widget.apiKeyId);
-      setErrorMessage("");
-    }
-  }, [widget, isOpen]);
-
-  const handleUpdateWidget = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Basic validation
-    if (!widgetName.trim()) {
-      setErrorMessage("Widget name is required");
-      return;
-    }
-
-    if (!selectedApiKeyId) {
-      setErrorMessage("Please select an API key");
-      return;
-    }
-
-    const intervalValue = parseInt(refreshInterval);
-    if (isNaN(intervalValue) || intervalValue < 1) {
-      setErrorMessage("Refresh interval must be a positive number");
-      return;
-    }
-
-    // Update widget
-    dispatch(
-      updateWidget({
-        id: widget.id,
-        updates: {
-          name: widgetName,
-          refreshInterval: intervalValue,
-          apiKeyId: selectedApiKeyId,
-        },
-      })
-    );
-
-    setErrorMessage("");
-    onOpenChange(false);
-  };
-
-  const handleAddNewKeyFromWidget = () => {
-    setIsApiKeyDialogOpen(true);
-  };
-
-  const handleAddNewKey = () => {
-    if (!newKeyName.trim() || !newKeyValue.trim()) {
-      setErrorMessage("Both name and value are required");
-      return;
-    }
-
-    addApiKey(newKeyName, newKeyValue);
-    // Find the newly added key by name
-    setTimeout(() => {
-      const newlyAddedKey = apiKeys.find((key) => key.name === newKeyName);
-      if (newlyAddedKey) {
-        setSelectedApiKeyId(newlyAddedKey.id);
-      }
-    }, 100);
-
-    setNewKeyName("");
-    setNewKeyValue("");
-    setNewKeyProvider("");
-    setErrorMessage("");
-    setIsApiKeyDialogOpen(false);
-  };
-
-  const handleCancelAddKey = () => {
-    setNewKeyName("");
-    setNewKeyValue("");
-    setNewKeyProvider("");
-    setErrorMessage("");
-    setIsApiKeyDialogOpen(false);
-  };
-
-  const selectedApiKey = apiKeys.find((key) => key.id === selectedApiKeyId);
-
-  const refreshIntervalOptions = [
-    { value: "30", label: "30 seconds" },
-    { value: "60", label: "1 minute" },
-    { value: "300", label: "5 minutes" },
-    { value: "600", label: "10 minutes" },
-    { value: "1800", label: "30 minutes" },
-    { value: "3600", label: "1 hour" },
-  ];
+    // Handlers
+    handleUpdateWidget,
+    handleAddNewKeyFromWidget,
+    handleAddNewKey,
+    handleCancelAddKey,
+    handleApiKeyDialogChange,
+  } = useWidgetConfigurationDialog(widget, isOpen);
 
   return (
     <>
@@ -147,7 +71,7 @@ export const WidgetConfigurationDialog: React.FC<
               be changed.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleUpdateWidget}>
+          <form onSubmit={(e) => handleUpdateWidget(e, onOpenChange)}>
             <div className="grid gap-4 py-4">
               {/* Error Message */}
               {errorMessage && (
@@ -256,11 +180,7 @@ export const WidgetConfigurationDialog: React.FC<
       {/* API Key Dialog */}
       <AddApiKeyDialog
         isOpen={isApiKeyDialogOpen}
-        onOpenChange={(open) => {
-          if (!open) {
-            setIsApiKeyDialogOpen(false);
-          }
-        }}
+        onOpenChange={handleApiKeyDialogChange}
         keyName={newKeyName}
         keyValue={newKeyValue}
         provider={newKeyProvider}

@@ -1,12 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
-import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import {
-  deleteWidget,
-  toggleWidgetVisibility,
-  Widget,
-} from "@/store/slices/widgetsSlice";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -27,6 +21,7 @@ import {
   Table,
 } from "lucide-react";
 import { ConditionalRenderer } from "@/ConditionalRenderer/ConditionalRenderer";
+import { useWidgetsManager } from "@/lib/use-widgets-manager";
 
 const getWidgetIcon = (type: string) => {
   switch (type) {
@@ -55,40 +50,19 @@ const getWidgetTypeDisplay = (type: string) => {
 };
 
 export const WidgetsManager = () => {
-  const dispatch = useAppDispatch();
-  const widgets = useAppSelector((state) => state.widgets.widgets);
-  const [isOpen, setIsOpen] = useState(false);
+  const {
+    // States
+    isOpen,
+    setIsOpen,
+    hiddenWidgets,
+    visibleWidgets,
 
-  const hiddenWidgets = widgets.filter((widget) => !widget.isVisible);
-  const visibleWidgets = widgets.filter((widget) => widget.isVisible);
-
-  const handleDeleteWidget = (id: string) => {
-    if (confirm("Are you sure you want to delete this widget?")) {
-      dispatch(deleteWidget(id));
-    }
-  };
-
-  const handleToggleVisibility = (id: string) => {
-    dispatch(toggleWidgetVisibility(id));
-  };
-
-  const handleShowAllHidden = () => {
-    hiddenWidgets.forEach((widget) => {
-      dispatch(toggleWidgetVisibility(widget.id));
-    });
-  };
-
-  const handleDeleteAllHidden = () => {
-    if (
-      confirm(
-        `Are you sure you want to delete all ${hiddenWidgets.length} hidden widgets? This action cannot be undone.`
-      )
-    ) {
-      hiddenWidgets.forEach((widget) => {
-        dispatch(deleteWidget(widget.id));
-      });
-    }
-  };
+    // Handlers
+    handleDeleteWidget,
+    handleToggleVisibility,
+    handleShowAllHidden,
+    handleDeleteAllHidden,
+  } = useWidgetsManager();
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

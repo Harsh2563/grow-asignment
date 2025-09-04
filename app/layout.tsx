@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { ThemeToggle } from "@/components/theme-toggle-new";
-import { FinanceLogo } from "@/components/svgs";
-import { NewWidgetDialog } from "@/components/new-widget-dialog";
-import { Navbar } from "@/components/navbar";
-import { ReduxProvider } from "@/components/redux-provider";
-import { QueryProvider } from "@/components/react-query/query-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { ThemeToggle } from "@/components/layout/theme-toggle-new";
+import { FinanceLogo } from "@/components/icons/svgs";
+import { NewWidgetDialog } from "@/components/widgets/new-widget-dialog";
+import { Navbar } from "@/components/layout/navbar";
+import { ReduxProvider } from "@/components/providers/redux-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 const inter = Inter({
   subsets: ["latin"],

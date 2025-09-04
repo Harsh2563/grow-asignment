@@ -1,7 +1,7 @@
 "use client";
-import InitialBackground from "@/components/empty-dashboard";
-import { ConditionalRenderer } from "@/ConditionalRenderer/ConditionalRenderer";
-import { WidgetsList } from "@/components/widgets-list";
+import InitialBackground from "@/components/layout/empty-dashboard";
+import { ConditionalRenderer } from "@/components/ui/ConditionalRenderer";
+import { WidgetsList } from "@/components/widgets/widgets-list";
 import { useAppSelector } from "@/store/hooks";
 
 export default function Home() {

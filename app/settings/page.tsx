@@ -1,6 +1,6 @@
 "use client";
 
-import { ApiKeysManagerComponent } from "@/components/api-keys-manager-component";
+import { ApiKeysManagerComponent } from "@/components/api-keys/api-keys-manager-component";
 
 export default function SettingsPage() {
   return (

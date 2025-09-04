@@ -4,7 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ThemeToggle } from "@/components/layout/theme-toggle-new";
 import { FinanceLogo } from "@/components/icons/svgs";
-import { NewWidgetDialog } from "@/components/widgets/new-widget-dialog";
+import { DynamicNewWidgetDialog } from "@/components/layout/dynamic-new-widget-dialog";
 import { Navbar } from "@/components/layout/navbar";
 import { ReduxProvider } from "@/components/providers/redux-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
@@ -68,10 +68,10 @@ export default function RootLayout({
                     {/* Right side - Actions */}
                     <div className="flex items-center gap-2 sm:gap-4">
                       <div className="hidden sm:block">
-                        <NewWidgetDialog />
+                        <DynamicNewWidgetDialog />
                       </div>
                       <div className="sm:hidden">
-                        <NewWidgetDialog />
+                        <DynamicNewWidgetDialog />
                       </div>
                       <ThemeToggle />
                     </div>

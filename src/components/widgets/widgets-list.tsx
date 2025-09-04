@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import {
   deleteWidget,
@@ -11,27 +12,135 @@ import {
 import { Card } from "@/components/ui/card";
 import { TrendingUp, BarChart3, Table } from "lucide-react";
 import { ConditionalRenderer } from "@/components/ui/ConditionalRenderer";
-import { FinanceTableWidget } from "@/components/widgets/finance-table-widget";
-import { StockChartWidget } from "@/components/charts/stock-chart-widget";
-import { ComprehensiveFinanceCard } from "@/components/widgets/comprehensive-finance-card";
-import { SortableWidgetItem } from "@/components/widgets/sortable-widget-item";
-import { WidgetsManager } from "@/components/widgets/widgets-manager";
-import { WidgetConfigurationDialog } from "@/components/widgets/widget-configuration-dialog";
+
+// Lazy load FinanceTableWidget to reduce initial bundle size
+const FinanceTableWidget = dynamic(
+  () =>
+    import("@/components/widgets/finance-table-widget").then((mod) => ({
+      default: mod.FinanceTableWidget,
+    })),
+  {
+    loading: () => (
+      <Card className="w-full h-[520px] flex flex-col">
+        <div className="flex items-center justify-center flex-1">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span className="ml-2 text-muted-foreground">
+            Loading table widget...
+          </span>
+        </div>
+      </Card>
+    ),
+    ssr: false,
+  }
+);
+
+// Lazy load StockChartWidget to reduce initial bundle size and defer loading of recharts library
+const StockChartWidget = dynamic(
+  () =>
+    import("@/components/charts/stock-chart-widget").then((mod) => ({
+      default: mod.StockChartWidget,
+    })),
+  {
+    loading: () => (
+      <Card className="p-6 h-[550px] flex flex-col">
+        <div className="flex items-center justify-center flex-1">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span className="ml-2 text-muted-foreground">Loading chart...</span>
+        </div>
+      </Card>
+    ),
+    ssr: false, // Disable SSR for charts to avoid hydration issues
+  }
+);
+
+// Lazy load ComprehensiveFinanceCard to reduce initial bundle size
+const ComprehensiveFinanceCard = dynamic(
+  () =>
+    import("@/components/widgets/comprehensive-finance-card").then((mod) => ({
+      default: mod.ComprehensiveFinanceCard,
+    })),
+  {
+    loading: () => (
+      <Card className="w-full h-[380px] flex flex-col">
+        <div className="flex items-center justify-center flex-1">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span className="ml-2 text-muted-foreground">
+            Loading ...
+          </span>
+        </div>
+      </Card>
+    ),
+    ssr: false,
+  }
+);
+
+// Lazy load SortableWidgetItem since it's only needed when widgets are displayed
+const SortableWidgetItem = dynamic(
+  () =>
+    import("@/components/widgets/sortable-widget-item").then((mod) => ({
+      default: mod.SortableWidgetItem,
+    })),
+  {
+    loading: () => (
+      <div className="animate-pulse">
+        <div className="h-48 bg-muted rounded-lg"></div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
+
+// Lazy load WidgetsManager since it's only shown when widgets exist
+const WidgetsManager = dynamic(
+  () =>
+    import("@/components/widgets/widgets-manager").then((mod) => ({
+      default: mod.WidgetsManager,
+    })),
+  {
+    loading: () => (
+      <div className="animate-pulse">
+        <div className="h-9 w-32 bg-muted rounded"></div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
+
+// Lazy load WidgetConfigurationDialog since it's only opened on user interaction
+const WidgetConfigurationDialog = dynamic(
+  () =>
+    import("@/components/widgets/widget-configuration-dialog").then((mod) => ({
+      default: mod.WidgetConfigurationDialog,
+    })),
+  {
+    loading: () => (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+        <div className="bg-background rounded-lg p-4 flex items-center gap-2">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+          <span className="text-sm">Loading dialog...</span>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 import { useApiKeys } from "@/lib/hooks/use-api-keys";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+
+// Lazy load drag and drop components since they're only needed when widgets exist and need to be reordered
+const DragDropProvider = dynamic(
+  () => import("@/components/widgets/drag-drop-provider"),
+  {
+    loading: () => (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-4 bg-muted rounded w-1/4 mb-2"></div>
+          <div className="h-32 bg-muted rounded"></div>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 export const WidgetsList = () => {
   const dispatch = useAppDispatch();
@@ -43,20 +152,9 @@ export const WidgetsList = () => {
   const [isConfigurationDialogOpen, setIsConfigurationDialogOpen] =
     useState(false);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
   const visibleWidgets = widgets.filter((widget) => widget.isVisible);
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = (event: any) => {
     const { active, over } = event;
 
     if (active.id !== over?.id) {
@@ -165,14 +263,10 @@ export const WidgetsList = () => {
 
       <ConditionalRenderer isVisible={visibleWidgets.length > 0}>
         <div className="pl-8">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
+          {visibleWidgets.length > 1 ? (
+            <DragDropProvider
               items={visibleWidgets.map((widget) => widget.id)}
-              strategy={verticalListSortingStrategy}
+              onDragEnd={handleDragEnd}
             >
               <div className="space-y-6">
                 {visibleWidgets.map((widget) => (
@@ -187,8 +281,22 @@ export const WidgetsList = () => {
                   </SortableWidgetItem>
                 ))}
               </div>
-            </SortableContext>
-          </DndContext>
+            </DragDropProvider>
+          ) : (
+            <div className="space-y-6">
+              {visibleWidgets.map((widget) => (
+                <SortableWidgetItem
+                  key={widget.id}
+                  widget={widget}
+                  onDelete={handleDeleteWidget}
+                  onToggleVisibility={handleToggleVisibility}
+                  onConfigure={handleConfigureWidget}
+                >
+                  {renderWidget(widget)}
+                </SortableWidgetItem>
+              ))}
+            </div>
+          )}
         </div>
       </ConditionalRenderer>
 

@@ -1,4 +1,5 @@
 "use client";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,7 +15,17 @@ import { Label } from "@/components/ui/label";
 import { Plus as PlusIcon } from "lucide-react";
 import { ApiKeySelector } from "@/components/api-keys/api-key-selector";
 import { WidgetFormFields } from "@/components/widgets/widget-form-fields";
-import { AddApiKeyDialog } from "@/components/api-keys/add-api-key-dialog";
+// Lazy load AddApiKeyDialog since it's only opened when user needs to add a new API key
+const AddApiKeyDialog = dynamic(
+  () =>
+    import("@/components/api-keys/add-api-key-dialog").then((mod) => ({
+      default: mod.AddApiKeyDialog,
+    })),
+  {
+    loading: () => null, // No loading state needed for nested dialog
+    ssr: false,
+  }
+);
 import { useNewWidgetDialog } from "@/lib/hooks/use-new-widget-dialog";
 
 export const NewWidgetDialog = () => {

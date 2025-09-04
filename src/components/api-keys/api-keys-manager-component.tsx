@@ -1,14 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { testApiKey } from "@/lib/api/api-key-tester";
 import { Button } from "@/components/ui/button";
 import { Key as KeyIcon, Plus as PlusIcon } from "lucide-react";
 import { ConditionalRenderer } from "@/components/ui/ConditionalRenderer";
 import { EmptyApiKeysState } from "@/components/api-keys/empty-api-keys-state";
 import { ApiKeysList } from "@/components/api-keys/api-keys-list";
-import { ApiKeySelector } from "@/components/api-keys/api-key-selector";
-import { AddApiKeyDialog } from "@/components/api-keys/add-api-key-dialog";
+
+const AddApiKeyDialog = dynamic(
+  () =>
+    import("@/components/api-keys/add-api-key-dialog").then((mod) => ({
+      default: mod.AddApiKeyDialog,
+    })),
+  {
+    loading: () => null, // loading state not needed for dialog
+    ssr: false,
+  }
+);
 import { useApiKeys } from "@/lib/hooks/use-api-keys";
 
 export const ApiKeysManagerComponent = () => {

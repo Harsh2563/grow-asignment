@@ -14,13 +14,6 @@ A sophisticated, full-featured financial dashboard built with Next.js 15, featur
 - **Widget Management**: Create, configure, hide/show, and delete widgets dynamically
 - **Persistent State**: Widget configurations saved across sessions
 
-### 🔐 **Multi-Provider API Key Management**
-
-- **Multiple API Providers**: Support for Alpha Vantage, Finnhub, Polygon, and NSE India
-- **API Key Testing**: Built-in validation and health checking
-- **Secure Storage**: Encrypted local storage with Redux Persist
-- **Key Rotation**: Easy switching between different API keys per widget
-
 ### ⚡ **Advanced Caching System**
 
 - **Multi-Layer Caching**:
@@ -43,7 +36,6 @@ A sophisticated, full-featured financial dashboard built with Next.js 15, featur
 - **Dark/Light Mode**: System-aware theme switching with next-themes
 - **Responsive Design**: Optimized for desktop, tablet, and mobile
 - **Smooth Animations**: CSS animations and transitions throughout
-- **Accessibility**: ARIA labels, keyboard navigation, screen reader support
 - **Component Library**: Custom UI components built on Radix UI primitives
 
 ## 🏗️ **Architecture & Technical Excellence**
@@ -100,38 +92,20 @@ src/
 - **React Query**: Server state management with automatic background updates
 - **Error Boundaries**: Graceful error handling and recovery
 - **Retry Logic**: Exponential backoff for failed requests
-- **Request Deduplication**: Prevent duplicate API calls
-- **Optimistic Updates**: Immediate UI feedback
 
 ### 🎯 **Performance Optimizations**
-
-#### **React Optimizations**
-
-- **Code Splitting**: Route-based and component-based lazy loading
-- **Memoization**: React.memo for expensive components
-- **useMemo/useCallback**: Prevent unnecessary re-renders
-- **Virtual Scrolling**: For large data sets in tables
 
 #### **Caching Strategies**
 
 - **Stale-While-Revalidate**: Show cached data while fetching fresh data
 - **Background Refresh**: Update cache without blocking UI
-- **Cache Compression**: LZ-string compression for large data sets
 - **TTL Management**: Automatic cache expiration and cleanup
-
-#### **Bundle Optimizations**
-
-- **Tree Shaking**: Remove unused code
-- **Dynamic Imports**: Load components on demand
-- **Image Optimization**: Next.js automatic image optimization
-- **Font Optimization**: Preload critical fonts
 
 ## 🛠️ **Technology Stack**
 
 ### **Frontend Core**
 
 - **Next.js 15.5.2** - React framework with App Router
-- **React 19.1.0** - Latest React with concurrent features
 - **TypeScript 5** - Full type safety throughout the application
 - **Tailwind CSS 4** - Utility-first styling with custom design system
 
@@ -152,8 +126,6 @@ src/
 - **@radix-ui/react-\*** - Accessible, unstyled UI primitives
 - **lucide-react 0.542.0** - Beautiful SVG icon library
 - **next-themes 0.4.6** - Theme management
-- **class-variance-authority** - Type-safe CSS class variants
-- **tailwind-merge 3.3.1** - Intelligent Tailwind class merging
 
 ### **Charts & Visualizations**
 
@@ -245,118 +217,11 @@ npm run type-check   # Run TypeScript compiler check
 
 ### **Custom Hook Patterns**
 
-```typescript
-// Composable hooks with automatic cleanup
-const useFinanceData = (symbol: string, apiKey: ApiKey) => {
-  const queryClient = useQueryClient();
-
-  return useQuery({
-    queryKey: ["stock", symbol, apiKey.id],
-    queryFn: () => fetchStockData(symbol, apiKey),
-    staleTime: 30 * 1000,
-    gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
-};
-```
-
 ### **Intelligent Caching Strategy**
-
-```typescript
-// Multi-layer caching with automatic invalidation
-class CacheManager {
-  set(key: string, value: any, ttl: number) {
-    const item = {
-      value,
-      timestamp: Date.now(),
-      ttl,
-    };
-
-    // Compress large objects
-    if (JSON.stringify(value).length > 10000) {
-      item.value = LZString.compress(JSON.stringify(value));
-      item.compressed = true;
-    }
-
-    localStorage.setItem(key, JSON.stringify(item));
-  }
-}
-```
 
 ### **Performance Monitoring**
 
-```typescript
-// Built-in performance tracking
-const usePerformanceMonitor = () => {
-  const [metrics, setMetrics] = useState({
-    renderTime: 0,
-    cacheHitRate: 0,
-    apiCalls: 0,
-  });
-
-  useEffect(() => {
-    const observer = new PerformanceObserver((list) => {
-      const entries = list.getEntries();
-      // Track component render times
-    });
-
-    observer.observe({ entryTypes: ["measure"] });
-    return () => observer.disconnect();
-  }, []);
-};
-```
-
 ### **Error Boundary Implementation**
-
-```typescript
-// Comprehensive error handling
-const ErrorBoundary = ({ children, fallback }) => {
-  return (
-    <QueryErrorResetBoundary>
-      {({ reset }) => (
-        <ErrorBoundaryComponent
-          onReset={reset}
-          fallbackRender={({ error, resetErrorBoundary }) => (
-            <ErrorFallback error={error} onReset={resetErrorBoundary} />
-          )}
-        >
-          {children}
-        </ErrorBoundaryComponent>
-      )}
-    </QueryErrorResetBoundary>
-  );
-};
-```
-
-## 🧪 **Testing Strategy**
-
-- **Unit Tests**: Individual component and hook testing
-- **Integration Tests**: Widget interaction and data flow testing
-- **E2E Tests**: Complete user journey testing
-- **Performance Tests**: Cache efficiency and render performance
-- **Accessibility Tests**: ARIA compliance and keyboard navigation
-
-## 🔮 **Future Enhancements**
-
-### **Planned Features**
-
-- **Real-time WebSocket Integration**: Live market data streaming
-- **Advanced Analytics**: Technical indicators and market analysis
-- **Portfolio Tracking**: Investment portfolio management
-- **Alerts & Notifications**: Price alerts and market notifications
-- **Export Functionality**: PDF reports and data export
-- **Social Features**: Share widgets and collaborate
-
-### **Technical Improvements**
-
-- **Service Workers**: Offline functionality and background sync
-- **WebAssembly**: High-performance calculations
-- **GraphQL Integration**: More efficient data fetching
-- **Micro-frontends**: Modular architecture for large teams
-
-## 📄 **License**
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🤝 **Contributing**
 
@@ -368,7 +233,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 **Support**
 
-For support, email harsh.rai2563@gmail.com or create an issue in the repository.
+For support, email raiharsh030@gmail.com or create an issue in the repository.
 
 ---
 

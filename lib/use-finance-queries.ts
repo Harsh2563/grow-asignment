@@ -226,6 +226,11 @@ export const useInvalidateQueries = () => {
         queryKey: queryKeys.marketMovers(apiKeyId),
       });
     },
+    invalidatePerformance: (symbol: string, apiKeyId: string) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.performance(symbol, apiKeyId),
+      });
+    },
   };
 };
 

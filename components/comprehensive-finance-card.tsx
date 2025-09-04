@@ -64,10 +64,45 @@ export const ComprehensiveFinanceCard = ({
     refetch: refetchPerformance,
   } = useStockPerformance(widget.stockSymbol || "", selectedApiKey || null);
 
-  const { invalidateStock, invalidateMarketMovers } = useInvalidateQueries();
+  const { invalidateStock, invalidateMarketMovers, invalidatePerformance } =
+    useInvalidateQueries();
 
   // Use auto-refresh hook for reliable data updates
   useAutoRefresh(widget.refreshInterval, selectedApiKey?.id || "");
+
+  const handleRefresh = async () => {
+    if (!selectedApiKey) return;
+
+    try {
+      // First invalidate all relevant queries to clear cache
+      if (widget.stockSymbol) {
+        invalidateStock(widget.stockSymbol, selectedApiKey.id);
+        invalidatePerformance(widget.stockSymbol, selectedApiKey.id);
+      }
+      invalidateMarketMovers(selectedApiKey.id);
+
+      // Wait a moment for cache invalidation to complete
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Then refetch data based on current active tab
+      const refetchPromises = [];
+
+      if (activeTab === "main" || activeTab === "performance") {
+        refetchPromises.push(refetchStock());
+      }
+      if (activeTab === "movers") {
+        refetchPromises.push(refetchMovers());
+      }
+      if (activeTab === "performance") {
+        refetchPromises.push(refetchPerformance());
+      }
+
+      // Wait for all refetches to complete
+      await Promise.all(refetchPromises);
+    } catch (error) {
+      console.error("Failed to refresh data:", error);
+    }
+  };
 
   const loading = isLoadingStock || isLoadingMovers || isLoadingPerformance;
   const error = stockError || moversError || performanceError;
@@ -91,17 +126,44 @@ export const ComprehensiveFinanceCard = ({
       <div className="space-y-6">
         {/* Main Stock Card */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 p-6 rounded-lg border">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-2xl font-bold">{mainStockData.symbol}</h3>
-              <p className="text-muted-foreground">Stock Price</p>
+          <div className="flex items-start justify-between">
+            {/* Left side - Stock info and OHLC */}
+            <div className="flex-1">
+              <div className="mb-4">
+                <h3 className="text-2xl font-bold">{mainStockData.symbol}</h3>
+                <p className="text-muted-foreground">Stock Price</p>
+              </div>
+
+              {/* Open, High, Low - Left aligned */}
+              <div className="flex gap-6">
+                <div className="text-left">
+                  <p className="text-xs text-muted-foreground mb-1">Open</p>
+                  <p className="font-semibold text-sm">
+                    {formatCurrency(mainStockData.o)}
+                  </p>
+                </div>
+                <div className="text-left">
+                  <p className="text-xs text-muted-foreground mb-1">High</p>
+                  <p className="font-semibold text-sm">
+                    {formatCurrency(mainStockData.h)}
+                  </p>
+                </div>
+                <div className="text-left">
+                  <p className="text-xs text-muted-foreground mb-1">Low</p>
+                  <p className="font-semibold text-sm">
+                    {formatCurrency(mainStockData.l)}
+                  </p>
+                </div>
+              </div>
             </div>
+
+            {/* Right side - Current price and change */}
             <div className="text-right">
               <div className="text-3xl font-bold">
                 {formatCurrency(mainStockData.c)}
               </div>
               <div
-                className={`flex items-center gap-1 ${
+                className={`flex items-center gap-1 justify-end ${
                   change.isPositive ? "text-green-600" : "text-red-600"
                 }`}
               >
@@ -116,21 +178,6 @@ export const ComprehensiveFinanceCard = ({
                   {formatPercentage(change.percentage)})
                 </span>
               </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 mt-4">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Open</p>
-              <p className="font-semibold">{formatCurrency(mainStockData.o)}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">High</p>
-              <p className="font-semibold">{formatCurrency(mainStockData.h)}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Low</p>
-              <p className="font-semibold">{formatCurrency(mainStockData.l)}</p>
             </div>
           </div>
         </div>
@@ -291,15 +338,24 @@ export const ComprehensiveFinanceCard = ({
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-3">
+    <Card className="w-full h-[380px] flex flex-col">
+      <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
             <DollarSign className="h-5 w-5" />
             {widget.name}
           </CardTitle>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {loading && <RefreshCw className="h-4 w-4 animate-spin" />}
+            <button
+              onClick={handleRefresh}
+              disabled={loading}
+              className="p-1.5 rounded-md hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Refresh data"
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+              />
+            </button>
             {(mainStockData || marketMovers) && (
               <span>Updated: {new Date().toLocaleTimeString()}</span>
             )}
@@ -341,7 +397,7 @@ export const ComprehensiveFinanceCard = ({
         </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="flex-1 overflow-y-auto">
         {loading && !mainStockData ? (
           <div className="flex items-center justify-center py-8">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />

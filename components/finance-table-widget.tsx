@@ -170,8 +170,8 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
   if (!widget.isVisible) return null;
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-3">
+    <Card className="w-full h-[520px] flex flex-col">
+      <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
             {widget.name}
@@ -184,7 +184,7 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 flex flex-col overflow-hidden">
         {loading && stocksData.length === 0 ? (
           <div className="flex items-center justify-center py-8">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -259,94 +259,96 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
             )}
 
             {/* Stocks Table */}
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="font-semibold">Symbol</TableHead>
-                  <TableHead className="font-semibold text-right">
-                    Current Price
-                  </TableHead>
-                  <TableHead className="font-semibold text-right">
-                    Change
-                  </TableHead>
-                  <TableHead className="font-semibold text-right">
-                    Change %
-                  </TableHead>
-                  <TableHead className="font-semibold text-right">
-                    High
-                  </TableHead>
-                  <TableHead className="font-semibold text-right">
-                    Low
-                  </TableHead>
-                  <TableHead className="font-semibold text-right">
-                    Open
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentStocks.length > 0 ? (
-                  currentStocks.map((stock) => {
-                    const change = calculateStockChange(stock);
-                    return (
-                      <TableRow key={stock.symbol}>
-                        <TableCell className="font-medium font-mono">
-                          {stock.symbol}
-                        </TableCell>
-                        <TableCell className="text-right font-mono">
-                          {formatCurrency(stock.c)}
-                        </TableCell>
-                        <TableCell
-                          className={`text-right font-mono ${
-                            change.isPositive
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          <div className="flex items-center justify-end gap-1">
-                            {change.isPositive ? (
-                              <TrendingUp className="h-4 w-4" />
-                            ) : (
-                              <TrendingDown className="h-4 w-4" />
-                            )}
-                            {change.isPositive ? "+" : ""}
-                            {formatCurrency(change.amount)}
-                          </div>
-                        </TableCell>
-                        <TableCell
-                          className={`text-right font-mono ${
-                            change.isPositive
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {formatPercentage(change.percentage)}
-                        </TableCell>
-                        <TableCell className="text-right font-mono">
-                          {formatCurrency(stock.h)}
-                        </TableCell>
-                        <TableCell className="text-right font-mono">
-                          {formatCurrency(stock.l)}
-                        </TableCell>
-                        <TableCell className="text-right font-mono">
-                          {formatCurrency(stock.o)}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                ) : (
+            <div className="flex-1 overflow-auto">
+              <Table>
+                <TableHeader className="sticky top-0 bg-background z-10">
                   <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="text-center py-8 text-muted-foreground"
-                    >
-                      {searchQuery
-                        ? `No stocks found matching "${searchQuery}"`
-                        : "No stocks available"}
-                    </TableCell>
+                    <TableHead className="font-semibold">Symbol</TableHead>
+                    <TableHead className="font-semibold text-right">
+                      Current Price
+                    </TableHead>
+                    <TableHead className="font-semibold text-right">
+                      Change
+                    </TableHead>
+                    <TableHead className="font-semibold text-right">
+                      Change %
+                    </TableHead>
+                    <TableHead className="font-semibold text-right">
+                      High
+                    </TableHead>
+                    <TableHead className="font-semibold text-right">
+                      Low
+                    </TableHead>
+                    <TableHead className="font-semibold text-right">
+                      Open
+                    </TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {currentStocks.length > 0 ? (
+                    currentStocks.map((stock) => {
+                      const change = calculateStockChange(stock);
+                      return (
+                        <TableRow key={stock.symbol}>
+                          <TableCell className="font-medium font-mono">
+                            {stock.symbol}
+                          </TableCell>
+                          <TableCell className="text-right font-mono">
+                            {formatCurrency(stock.c)}
+                          </TableCell>
+                          <TableCell
+                            className={`text-right font-mono ${
+                              change.isPositive
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            <div className="flex items-center justify-end gap-1">
+                              {change.isPositive ? (
+                                <TrendingUp className="h-4 w-4" />
+                              ) : (
+                                <TrendingDown className="h-4 w-4" />
+                              )}
+                              {change.isPositive ? "+" : ""}
+                              {formatCurrency(change.amount)}
+                            </div>
+                          </TableCell>
+                          <TableCell
+                            className={`text-right font-mono ${
+                              change.isPositive
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            {formatPercentage(change.percentage)}
+                          </TableCell>
+                          <TableCell className="text-right font-mono">
+                            {formatCurrency(stock.h)}
+                          </TableCell>
+                          <TableCell className="text-right font-mono">
+                            {formatCurrency(stock.l)}
+                          </TableCell>
+                          <TableCell className="text-right font-mono">
+                            {formatCurrency(stock.o)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={7}
+                        className="text-center py-8 text-muted-foreground"
+                      >
+                        {searchQuery
+                          ? `No stocks found matching "${searchQuery}"`
+                          : "No stocks available"}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
 
             {/* Pagination */}
             {totalPages > 1 && (

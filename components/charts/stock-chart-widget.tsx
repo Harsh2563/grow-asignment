@@ -104,7 +104,15 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
   }, [refreshInterval, symbol, apiKey, selectedInterval]);
 
   // Custom tooltip for line chart
-  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ payload: { volume: number }; value: number }>; label?: string }) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean;
+    payload?: Array<{ payload: { volume: number }; value: number }>;
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -136,8 +144,8 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
 
   if (loading) {
     return (
-      <Card className="p-6">
-        <div className="flex items-center justify-center h-64">
+      <Card className="p-6 h-[550px] flex flex-col">
+        <div className="flex items-center justify-center flex-1">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       </Card>
@@ -146,8 +154,8 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
 
   if (error) {
     return (
-      <Card className="p-6">
-        <div className="text-center">
+      <Card className="p-6 h-[550px] flex flex-col">
+        <div className="text-center flex items-center justify-center flex-1">
           <p className="text-destructive mb-4">{error}</p>
           <Button onClick={fetchData} variant="outline">
             Retry
@@ -158,9 +166,9 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
   }
 
   return (
-    <Card className="p-6">
+    <Card className="p-6 h-[550px] flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-shrink-0">
         <div>
           <h3 className="text-lg font-semibold">{symbol} Price Chart</h3>
           <ConditionalRenderer isVisible={!!currentPrice}>
@@ -208,7 +216,7 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
       </div>
 
       {/* Chart */}
-      <div className="h-80">
+      <div className="flex-1 min-h-0">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={lineData}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />

@@ -32,61 +32,99 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   StockData,
-  StockSymbol,
-  fetchPopularStocksData,
-  searchStockData,
   calculateStockChange,
   formatCurrency,
   formatPercentage,
 } from "@/lib/finance-api";
+import {
+  usePopularStocks,
+  useStockSearch,
+  useInvalidateQueries,
+  useAutoRefresh,
+} from "@/lib/use-finance-queries";
 
 interface TableWidgetProps {
   widget: Widget;
 }
 
 export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
-  const [stocksData, setStocksData] = useState<StockData[]>([]);
-  const [availableSymbols, setAvailableSymbols] = useState<StockSymbol[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchedStocks, setSearchedStocks] = useState<Set<string>>(new Set());
-  const [isSearching, setIsSearching] = useState(false);
+  const [searchedStocksData, setSearchedStocksData] = useState<StockData[]>([]);
+  const [shouldSearch, setShouldSearch] = useState(false);
+  const [currentSearchTerm, setCurrentSearchTerm] = useState("");
 
   const ITEMS_PER_PAGE = 5;
 
   const apiKeys = useAppSelector((state) => state.apiKeys.apiKeys);
   const selectedApiKey = apiKeys.find((key) => key.id === widget.apiKeyId);
 
+  const {
+    data: popularData,
+    isLoading: isLoadingPopular,
+    error: popularError,
+    refetch: refetchPopular,
+  } = usePopularStocks(selectedApiKey || null);
+
+  const {
+    data: searchResult,
+    isLoading: isSearching,
+    error: searchError,
+  } = useStockSearch(currentSearchTerm, selectedApiKey || null, shouldSearch);
+
+  const { invalidatePopularStocks } = useInvalidateQueries();
+
+  // Use auto-refresh hook for reliable data updates
+  useAutoRefresh(widget.refreshInterval, selectedApiKey?.id || "");
+
+  // Combine popular stocks and searched stocks
+  const stocksData = useMemo(() => {
+    const popularStocks = popularData?.stocksData || [];
+    const combinedStocks = [...popularStocks, ...searchedStocksData];
+
+    const uniqueStocks = combinedStocks.reduce((acc, stock) => {
+      const existingIndex = acc.findIndex((s) => s.symbol === stock.symbol);
+      if (existingIndex >= 0) {
+        // Replace with the more recent data (searched stocks take priority)
+        if (searchedStocksData.some((s) => s.symbol === stock.symbol)) {
+          acc[existingIndex] = stock;
+        }
+      } else {
+        acc.push(stock);
+      }
+      return acc;
+    }, [] as StockData[]);
+
+    return uniqueStocks;
+  }, [popularData?.stocksData, searchedStocksData]);
+
+  const loading = isLoadingPopular && searchedStocksData.length === 0;
+  const error = popularError || searchError;
+
+  useEffect(() => {
+    if (searchResult && shouldSearch) {
+      setSearchedStocksData((prev) => {
+        const filtered = prev.filter(
+          (stock) => stock.symbol !== searchResult.symbol
+        );
+        return [...filtered, searchResult];
+      });
+      setSearchedStocks(
+        (prev) => new Set([...prev, currentSearchTerm.toUpperCase()])
+      );
+      setShouldSearch(false);
+      setCurrentSearchTerm("");
+    }
+  }, [searchResult, shouldSearch, currentSearchTerm]);
+
   const searchAndAddStock = async (symbol: string): Promise<void> => {
     if (!selectedApiKey || searchedStocks.has(symbol.toUpperCase())) {
       return;
     }
 
-    setIsSearching(true);
-    try {
-      const stockData = await searchStockData(symbol, selectedApiKey);
-      if (stockData) {
-        setStocksData((prev) => {
-          const filtered = prev.filter(
-            (stock) => stock.symbol !== stockData.symbol
-          );
-          return [...filtered, stockData];
-        });
-        setSearchedStocks((prev) => new Set([...prev, symbol.toUpperCase()]));
-        setLastUpdated(new Date());
-        setError(null);
-      } else {
-        setError(`No data found for symbol: ${symbol.toUpperCase()}`);
-      }
-    } catch (err) {
-      console.error(`Error searching for ${symbol}:`, err);
-      setError(`Failed to fetch data for ${symbol.toUpperCase()}`);
-    } finally {
-      setIsSearching(false);
-    }
+    setCurrentSearchTerm(symbol.toUpperCase());
+    setShouldSearch(true);
   };
 
   const handleSearchClick = async () => {
@@ -129,47 +167,6 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
     setCurrentPage(1);
   }, [searchQuery]);
 
-  const fetchAllStocksData = async () => {
-    if (!selectedApiKey) {
-      setError("No API key found");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const result = await fetchPopularStocksData(
-        selectedApiKey,
-        availableSymbols
-      );
-
-      if (result.stocksData.length === 0) {
-        setError("Failed to fetch any stock data");
-      } else {
-        setStocksData(result.stocksData);
-        setAvailableSymbols(result.symbols);
-        setLastUpdated(new Date());
-      }
-    } catch (err) {
-      setError("Network error occurred");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAllStocksData();
-
-    // Set up refresh interval
-    const interval = setInterval(() => {
-      fetchAllStocksData();
-    }, widget.refreshInterval * 1000);
-
-    return () => clearInterval(interval);
-  }, [widget.apiKeyId, widget.refreshInterval]);
-
   if (!widget.isVisible) return null;
 
   return (
@@ -181,8 +178,8 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
           </CardTitle>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {loading && <RefreshCw className="h-4 w-4 animate-spin" />}
-            {lastUpdated && (
-              <span>Updated: {lastUpdated.toLocaleTimeString()}</span>
+            {popularData && (
+              <span>Updated: {new Date().toLocaleTimeString()}</span>
             )}
           </div>
         </div>
@@ -198,7 +195,7 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
         ) : error ? (
           <div className="flex items-center justify-center py-8 text-destructive">
             <AlertCircle className="h-8 w-8 mr-2" />
-            <span>{error}</span>
+            <span>{error?.message || "An error occurred"}</span>
           </div>
         ) : stocksData.length > 0 ? (
           <div className="space-y-4">
@@ -251,7 +248,8 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
                   size="sm"
                   onClick={() => {
                     setSearchedStocks(new Set());
-                    fetchAllStocksData();
+                    setSearchedStocksData([]);
+                    refetchPopular();
                   }}
                   className="h-auto p-0 ml-2"
                 >

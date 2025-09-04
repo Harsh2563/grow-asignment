@@ -17,13 +17,17 @@ import {
 } from "lucide-react";
 import {
   StockData,
-  searchStockData,
   calculateStockChange,
   formatCurrency,
   formatPercentage,
-  fetchMarketMovers,
-  fetchPerformanceData,
 } from "@/lib/finance-api";
+import {
+  useStockData,
+  useMarketMovers,
+  useStockPerformance,
+  useInvalidateQueries,
+  useAutoRefresh,
+} from "@/lib/use-finance-queries";
 
 interface ComprehensiveFinanceCardProps {
   widget: Widget;
@@ -32,31 +36,6 @@ interface ComprehensiveFinanceCardProps {
 export const ComprehensiveFinanceCard = ({
   widget,
 }: ComprehensiveFinanceCardProps) => {
-  const [mainStockData, setMainStockData] = useState<StockData | null>(null);
-
-  const [marketMovers, setMarketMovers] = useState<{
-    gainers: StockData[];
-    losers: StockData[];
-  }>({ gainers: [], losers: [] });
-
-  const [performanceData, setPerformanceData] = useState<{
-    weekHigh: number;
-    weekLow: number;
-    marketCap: string;
-    peRatio: string;
-    volume: number;
-    avgVolume: number;
-    dividendYield: string;
-    eps: number;
-    revenuePerShare: number;
-    roe: string;
-    currentRatio: number;
-    debtToEquity: number;
-  } | null>(null);
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState<"main" | "movers" | "performance">(
     "main"
   );
@@ -64,58 +43,34 @@ export const ComprehensiveFinanceCard = ({
   const apiKeys = useAppSelector((state) => state.apiKeys.apiKeys);
   const selectedApiKey = apiKeys.find((key) => key.id === widget.apiKeyId);
 
-  const fetchAllData = async () => {
-    if (!selectedApiKey) {
-      setError("No API key found");
-      setLoading(false);
-      return;
-    }
+  const {
+    data: mainStockData,
+    isLoading: isLoadingStock,
+    error: stockError,
+    refetch: refetchStock,
+  } = useStockData(widget.stockSymbol || "", selectedApiKey || null);
 
-    try {
-      setLoading(true);
-      setError(null);
+  const {
+    data: marketMovers,
+    isLoading: isLoadingMovers,
+    error: moversError,
+    refetch: refetchMovers,
+  } = useMarketMovers(selectedApiKey || null);
 
-      if (widget.stockSymbol) {
-        const stockData = await searchStockData(
-          widget.stockSymbol,
-          selectedApiKey
-        );
-        if (stockData) {
-          setMainStockData(stockData);
+  const {
+    data: performanceData,
+    isLoading: isLoadingPerformance,
+    error: performanceError,
+    refetch: refetchPerformance,
+  } = useStockPerformance(widget.stockSymbol || "", selectedApiKey || null);
 
-          // Fetch real performance data from API
-          const realPerformanceData = await fetchPerformanceData(
-            widget.stockSymbol,
-            selectedApiKey
-          );
-          if (realPerformanceData) {
-            setPerformanceData(realPerformanceData);
-          }
-        }
-      }
+  const { invalidateStock, invalidateMarketMovers } = useInvalidateQueries();
 
-      // Fetch market movers data using the new API
-      const marketMoversResult = await fetchMarketMovers(selectedApiKey);
-      setMarketMovers(marketMoversResult);
+  // Use auto-refresh hook for reliable data updates
+  useAutoRefresh(widget.refreshInterval, selectedApiKey?.id || "");
 
-      setLastUpdated(new Date());
-    } catch (err) {
-      setError("Failed to fetch data");
-      console.error("Error fetching comprehensive finance data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAllData();
-
-    const interval = setInterval(() => {
-      fetchAllData();
-    }, widget.refreshInterval * 1000);
-
-    return () => clearInterval(interval);
-  }, [widget.apiKeyId, widget.stockSymbol, widget.refreshInterval]);
+  const loading = isLoadingStock || isLoadingMovers || isLoadingPerformance;
+  const error = stockError || moversError || performanceError;
 
   if (!widget.isVisible) return null;
 
@@ -184,8 +139,8 @@ export const ComprehensiveFinanceCard = ({
   };
 
   const renderMoversSection = () => {
-    const gainers = marketMovers.gainers.slice(0, 5);
-    const losers = marketMovers.losers.slice(0, 5);
+    const gainers = marketMovers?.gainers?.slice(0, 5) || [];
+    const losers = marketMovers?.losers?.slice(0, 5) || [];
 
     return (
       <div className="space-y-6">
@@ -345,8 +300,8 @@ export const ComprehensiveFinanceCard = ({
           </CardTitle>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {loading && <RefreshCw className="h-4 w-4 animate-spin" />}
-            {lastUpdated && (
-              <span>Updated: {lastUpdated.toLocaleTimeString()}</span>
+            {(mainStockData || marketMovers) && (
+              <span>Updated: {new Date().toLocaleTimeString()}</span>
             )}
           </div>
         </div>
@@ -395,7 +350,7 @@ export const ComprehensiveFinanceCard = ({
         ) : error ? (
           <div className="flex items-center justify-center py-8 text-destructive">
             <AlertCircle className="h-8 w-8 mr-2" />
-            <span>{error}</span>
+            <span>{error?.message || "An error occurred"}</span>
           </div>
         ) : (
           <div>

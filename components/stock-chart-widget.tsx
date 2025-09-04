@@ -21,7 +21,12 @@ import {
   type LineChartData,
   type ChartInterval,
 } from "@/lib/chart-data-service";
-import { fetchStockData, type ApiKey, type StockData } from "@/lib/finance-api";
+import { type ApiKey, type StockData } from "@/lib/finance-api";
+import {
+  useStockData,
+  useChartData,
+  useAutoRefresh,
+} from "@/lib/use-finance-queries";
 
 interface StockChartWidgetProps {
   widgetId: string;
@@ -40,92 +45,61 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
   refreshInterval,
   onError,
 }) => {
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [lineData, setLineData] = useState<LineChartData[]>([]);
-  const [currentPrice, setCurrentPrice] = useState<StockData | null>(null);
   const [selectedInterval, setSelectedInterval] =
     useState<ChartInterval>("daily");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showMA, setShowMA] = useState(false);
   const [movingAverages, setMovingAverages] = useState<{
     ma20: Array<{ date: string; ma: number }>;
     ma50: Array<{ date: string; ma: number }>;
   }>({ ma20: [], ma50: [] });
 
-  // Fetch current stock price
-  const fetchCurrentPrice = async () => {
-    try {
-      const stockData = await fetchStockData(symbol, apiKey);
-      if (stockData) {
-        setCurrentPrice(stockData);
-      }
-    } catch (err) {
-      console.error("Error fetching current price:", err);
+  const {
+    data: currentPrice,
+    isLoading: isLoadingStock,
+    error: stockError,
+  } = useStockData(symbol, apiKey);
+
+  const {
+    data: chartData,
+    isLoading: isLoadingChart,
+    error: chartError,
+  } = useChartData(symbol, selectedInterval, apiKey);
+
+  // Use auto-refresh for reliable data updates
+  useAutoRefresh(refreshInterval, apiKey?.id || "");
+
+  const loading = isLoadingStock || isLoadingChart;
+  const error = stockError?.message || chartError?.message || null;
+
+  useEffect(() => {
+    if (chartData && chartType === "line") {
+      setLineData(convertToLineData(chartData));
+    }
+  }, [chartData, chartType]);
+
+  // Handle errors
+  useEffect(() => {
+    if (error) {
+      onError?.(error);
+    }
+  }, [error, onError]);
+
+  const handleManualRefresh = () => {
+    if (apiKey?.id) {
     }
   };
-
-  // Fetch chart data
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Fetch current price first
-      await fetchCurrentPrice();
-
-      // Fetch historical data
-      const data = await fetchChartData(
-        symbol,
-        apiKey,
-        selectedInterval
-      );
-
-      if (data.length === 0) {
-        throw new Error("No chart data available");
-      }
-
-      // Format data for the selected interval
-      const formattedData = formatChartDataForInterval(data, selectedInterval);
-      setChartData(formattedData);
-
-      // Convert to line data if needed
-      if (chartType === "line") {
-        setLineData(convertToLineData(formattedData));
-      }
-
-      // Calculate moving averages
-      // TODO: Implement calculateMovingAverage function
-      // if (formattedData.length >= 50) {
-      //   const ma20 = calculateMovingAverage(formattedData, 20);
-      //   const ma50 = calculateMovingAverage(formattedData, 50);
-      //   setMovingAverages({ ma20, ma50 });
-      // }
-    } catch (err) {
-      const errorMsg =
-        err instanceof Error ? err.message : "Failed to fetch chart data";
-      setError(errorMsg);
-      onError?.(errorMsg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Initial data fetch
-  useEffect(() => {
-    fetchData();
-  }, [symbol, apiKey, selectedInterval]);
-
-  // Auto-refresh data
-  useEffect(() => {
-    if (refreshInterval > 0) {
-      const interval = setInterval(fetchData, refreshInterval * 1000);
-      return () => clearInterval(interval);
-    }
-  }, [refreshInterval, symbol, apiKey, selectedInterval]);
 
   // Custom tooltip for line chart
-  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ payload: { volume: number }; value: number }>; label?: string }) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean;
+    payload?: Array<{ payload: { volume: number }; value: number }>;
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -143,7 +117,6 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
     return null;
   };
 
-  // Calculate price change
   const getPriceChange = () => {
     if (!currentPrice) return null;
     const change = currentPrice.c - currentPrice.pc;
@@ -170,7 +143,7 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
       <Card className="p-6">
         <div className="text-center">
           <p className="text-destructive mb-4">{error}</p>
-          <Button onClick={fetchData} variant="outline">
+          <Button onClick={handleManualRefresh} variant="outline">
             Retry
           </Button>
         </div>
@@ -347,7 +320,7 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
       {/* Data info */}
       <div className="mt-4 text-xs text-muted-foreground">
         Last updated: {new Date().toLocaleTimeString()} • Data points:{" "}
-        {chartType === "line" ? lineData.length : chartData.length}
+        {chartType === "line" ? lineData.length : chartData?.length || 0}
       </div>
     </Card>
   );

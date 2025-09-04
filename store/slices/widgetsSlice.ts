@@ -6,7 +6,7 @@ export interface Widget {
   type: "table" | "card" | "chart";
   stockSymbol: string;
   chartType?: "line";
-  cardType?: "watchlist" | "gainers" | "performance" | "financial";
+  cardType?: "comprehensive";
   refreshInterval: number;
   apiKeyId: string;
   isVisible: boolean;

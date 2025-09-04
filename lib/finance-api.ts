@@ -41,7 +41,7 @@ export const getPopularStockSymbols = (symbols: StockSymbol[]): string[] => {
   // Indian popular companies for NSE India API
   const popularIndianCompanies = [
     "RELIANCE",
-    "TCS", 
+    "TCS",
     "HDFCBANK",
     "INFY",
     "HINDUNILVR",
@@ -59,7 +59,7 @@ export const getPopularStockSymbols = (symbols: StockSymbol[]): string[] => {
     "ULTRACEMCO",
     "NESTLEIND",
     "POWERGRID",
-    "NTPC"
+    "NTPC",
   ];
 
   // For NSE India, just return the popular symbols directly
@@ -208,6 +208,129 @@ export const formatCurrency = (value: number): string => {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
+};
+
+/**
+ * Fetch real market movers (top gainers and losers)
+ */
+export const fetchMarketMovers = async (
+  apiKey: ApiKey
+): Promise<{
+  gainers: StockData[];
+  losers: StockData[];
+}> => {
+  try {
+    const response = await fetch("/api/financial-data", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        symbol: "",
+        apiKey: apiKey.key,
+        provider: apiKey.provider || "nseindia",
+        dataType: "market-movers",
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      const gainersData: StockData[] = (result.data.top_gainers || []).map(
+        (item: any) => ({
+          symbol: item.symbol,
+          c: parseFloat(item.price),
+          h: parseFloat(item.price) * 1.02,
+          l: parseFloat(item.price) * 0.98,
+          o: parseFloat(item.price) - parseFloat(item.change_amount),
+          pc: parseFloat(item.price) - parseFloat(item.change_amount),
+          t: Math.floor(Date.now() / 1000),
+        })
+      );
+
+      const losersData: StockData[] = (result.data.top_losers || []).map(
+        (item: any) => ({
+          symbol: item.symbol,
+          c: parseFloat(item.price),
+          h: parseFloat(item.price) * 1.02,
+          l: parseFloat(item.price) * 0.98,
+          o: parseFloat(item.price) - parseFloat(item.change_amount),
+          pc: parseFloat(item.price) - parseFloat(item.change_amount),
+          t: Math.floor(Date.now() / 1000),
+        })
+      );
+
+      return {
+        gainers: gainersData,
+        losers: losersData,
+      };
+    }
+
+    return { gainers: [], losers: [] };
+  } catch (err) {
+    console.error("Error fetching market movers:", err);
+    return { gainers: [], losers: [] };
+  }
+};
+
+/**
+ * Fetch real performance data for a stock
+ */
+export const fetchPerformanceData = async (
+  symbol: string,
+  apiKey: ApiKey
+): Promise<{
+  weekHigh: number;
+  weekLow: number;
+  marketCap: string;
+  peRatio: string;
+  volume: number;
+  avgVolume: number;
+  dividendYield: string;
+  eps: number;
+  revenuePerShare: number;
+  roe: string;
+  currentRatio: number;
+  debtToEquity: number;
+} | null> => {
+  try {
+    const response = await fetch("/api/financial-data", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        symbol: symbol,
+        apiKey: apiKey.key,
+        provider: apiKey.provider || "nseindia",
+        dataType: "performance",
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      const data = result.data;
+      return {
+        weekHigh: data.FiftyTwoWeekHigh || 0,
+        weekLow: data.FiftyTwoWeekLow || 0,
+        marketCap: data.MarketCapitalization || "N/A",
+        peRatio: data.PERatio || "N/A",
+        volume: data.Volume || 0,
+        avgVolume: data.AverageVolume || 0,
+        dividendYield: data.DividendYield || "N/A",
+        eps: data.EarningsPerShare || 0,
+        revenuePerShare: data.RevenuePerShare || 0,
+        roe: data.ReturnOnEquity || "N/A",
+        currentRatio: data.CurrentRatio || 0,
+        debtToEquity: data.DebtToEquity || 0,
+      };
+    }
+    return null;
+  } catch (err) {
+    console.error("Error fetching performance data:", err);
+    return null;
+  }
 };
 
 /**

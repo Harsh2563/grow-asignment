@@ -57,7 +57,7 @@ export const WidgetFormFields = ({
         >
           <option value="">Select widget type</option>
           <option value="table">Stock Table</option>
-          <option value="card">Finance Card</option>
+          <option value="card">Comprehensive Finance Card</option>
           <option value="chart">Price Chart</option>
         </select>
       </div>
@@ -116,17 +116,18 @@ export const WidgetFormFields = ({
       {/* Card Type - Only show for card widgets */}
       <ConditionalRenderer isVisible={widgetType === "card"}>
         <div className="grid gap-3">
-          <Label htmlFor="card-type">Card Type</Label>
-          <select
-            id="card-type"
-            name="card-type"
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <option value="watchlist">Watchlist</option>
-            <option value="gainers">Market Gainers</option>
-            <option value="performance">Performance Data</option>
-            <option value="financial">Financial Data</option>
-          </select>
+          <Label htmlFor="card-type">Card Description</Label>
+          <div className="p-3 bg-muted/50 rounded-md border">
+            <p className="text-sm text-muted-foreground">
+              This comprehensive finance card includes:
+            </p>
+            <ul className="mt-2 text-sm text-muted-foreground space-y-1 ml-4">
+              <li>• Stock Overview with live price data</li>
+              <li>• Personal Watchlist management</li>
+              <li>• Market Gainers and Losers</li>
+              <li>• Performance and Financial Data</li>
+            </ul>
+          </div>
         </div>
       </ConditionalRenderer>
 

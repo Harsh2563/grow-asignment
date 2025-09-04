@@ -18,6 +18,7 @@ import {
 import { ConditionalRenderer } from "@/ConditionalRenderer/ConditionalRenderer";
 import { FinanceTableWidget } from "@/components/finance-table-widget";
 import { StockChartWidget } from "@/components/charts/stock-chart-widget";
+import { ComprehensiveFinanceCard } from "@/components/comprehensive-finance-card";
 import { useApiKeys } from "@/lib/use-api-keys";
 
 const getWidgetIcon = (type: string) => {
@@ -62,12 +63,12 @@ export const WidgetsList = () => {
   };
 
   const getApiKeyForWidget = (apiKeyId: string) => {
-    return apiKeys.find(key => key.id === apiKeyId);
+    return apiKeys.find((key) => key.id === apiKeyId);
   };
 
   const renderWidget = (widget: any) => {
     const apiKey = getApiKeyForWidget(widget.apiKeyId);
-    
+
     if (!apiKey) {
       return (
         <Card key={widget.id} className="p-6">
@@ -79,10 +80,13 @@ export const WidgetsList = () => {
     }
 
     switch (widget.type) {
-      case 'table':
+      case "table":
         return <FinanceTableWidget key={widget.id} widget={widget} />;
-      
-      case 'chart':
+
+      case "card":
+        return <ComprehensiveFinanceCard key={widget.id} widget={widget} />;
+
+      case "chart":
         return (
           <StockChartWidget
             key={widget.id}

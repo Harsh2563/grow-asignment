@@ -65,11 +65,8 @@ export const NewWidgetDialog = () => {
       name: widgetName,
       type: widgetType as "table" | "card" | "chart",
       stockSymbol: widgetType === "table" ? "" : stockSymbol, // Empty for table widgets
-      chartType:
-        widgetType === "chart"
-          ? (chartType as "line" | "candlestick")
-          : undefined,
-      cardType: widgetType === "card" ? ("watchlist" as const) : undefined,
+      chartType: widgetType === "chart" ? (chartType as "line") : undefined,
+      cardType: widgetType === "card" ? ("comprehensive" as const) : undefined,
       refreshInterval: parseInt(refreshInterval),
       apiKeyId: selectedApiKeyId,
       isVisible: true,
@@ -139,7 +136,8 @@ export const NewWidgetDialog = () => {
             <DialogTitle>Add New Widget</DialogTitle>
             <DialogDescription>
               Create a new financial widget to display real-time stock data on
-              your dashboard.
+              your dashboard. Choose from comprehensive finance cards, stock
+              tables, or price charts.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddWidget}>

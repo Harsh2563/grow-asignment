@@ -6,13 +6,14 @@ import { CSS } from "@dnd-kit/utilities";
 import { Widget } from "@/store/slices/widgetsSlice";
 import { Button } from "@/components/ui/button";
 import { DragHandle } from "@/components/ui/drag-handle";
-import { Trash2, Eye, EyeOff } from "lucide-react";
+import { Trash2, Eye, EyeOff, Settings } from "lucide-react";
 
 interface SortableWidgetItemProps {
   widget: Widget;
   children: React.ReactNode;
   onDelete: (id: string) => void;
   onToggleVisibility: (id: string) => void;
+  onConfigure: (id: string) => void;
 }
 
 export const SortableWidgetItem: React.FC<SortableWidgetItemProps> = ({
@@ -20,6 +21,7 @@ export const SortableWidgetItem: React.FC<SortableWidgetItemProps> = ({
   children,
   onDelete,
   onToggleVisibility,
+  onConfigure,
 }) => {
   const {
     attributes,
@@ -61,6 +63,15 @@ export const SortableWidgetItem: React.FC<SortableWidgetItemProps> = ({
 
       {/* Control Buttons */}
       <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => onConfigure(widget.id)}
+          className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm border shadow-sm hover:bg-background"
+          title="Configure widget"
+        >
+          <Settings className="h-4 w-4" />
+        </Button>
         <Button
           variant="secondary"
           size="sm"

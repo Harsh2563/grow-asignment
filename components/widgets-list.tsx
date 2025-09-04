@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import {
   deleteWidget,
@@ -16,6 +16,7 @@ import { StockChartWidget } from "@/components/charts/stock-chart-widget";
 import { ComprehensiveFinanceCard } from "@/components/comprehensive-finance-card";
 import { SortableWidgetItem } from "@/components/sortable-widget-item";
 import { WidgetsManager } from "@/components/widgets-manager";
+import { WidgetConfigurationDialog } from "@/components/widget-configuration-dialog";
 import { useApiKeys } from "@/lib/use-api-keys";
 import {
   DndContext,
@@ -36,6 +37,8 @@ export const WidgetsList = () => {
   const dispatch = useAppDispatch();
   const widgets = useAppSelector((state) => state.widgets.widgets);
   const { apiKeys } = useApiKeys();
+  const [configurationWidget, setConfigurationWidget] = useState<Widget | null>(null);
+  const [isConfigurationDialogOpen, setIsConfigurationDialogOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -71,6 +74,14 @@ export const WidgetsList = () => {
 
   const handleToggleVisibility = (id: string) => {
     dispatch(toggleWidgetVisibility(id));
+  };
+
+  const handleConfigureWidget = (id: string) => {
+    const widget = widgets.find((w) => w.id === id);
+    if (widget) {
+      setConfigurationWidget(widget);
+      setIsConfigurationDialogOpen(true);
+    }
   };
 
   const getApiKeyForWidget = (apiKeyId: string) => {
@@ -167,6 +178,7 @@ export const WidgetsList = () => {
                     widget={widget}
                     onDelete={handleDeleteWidget}
                     onToggleVisibility={handleToggleVisibility}
+                    onConfigure={handleConfigureWidget}
                   >
                     {renderWidget(widget)}
                   </SortableWidgetItem>
@@ -176,6 +188,15 @@ export const WidgetsList = () => {
           </DndContext>
         </div>
       </ConditionalRenderer>
+
+      {/* Widget Configuration Dialog */}
+      {configurationWidget && (
+        <WidgetConfigurationDialog
+          widget={configurationWidget}
+          isOpen={isConfigurationDialogOpen}
+          onOpenChange={setIsConfigurationDialogOpen}
+        />
+      )}
     </div>
   );
 };

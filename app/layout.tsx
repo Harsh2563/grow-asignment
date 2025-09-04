@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle-new";
 import { FinanceLogo } from "@/components/svgs";
 import { NewWidgetDialog } from "@/components/new-widget-dialog";
+import { Navbar } from "@/components/navbar";
 import { ReduxProvider } from "@/components/redux-provider";
 
 const inter = Inter({
@@ -40,16 +41,37 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <header className="flex justify-between items-center px-6 py-4 border-b border-border bg-card/50">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-white font-bold">
-                  <FinanceLogo />
+            <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+              <div className="container mx-auto px-4 sm:px-6">
+                <div className="flex h-16 items-center justify-between">
+                  {/* Left side - Logo and Navigation */}
+                  <div className="flex items-center gap-4 sm:gap-6">
+                    {/* Logo */}
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-white font-bold">
+                        <FinanceLogo />
+                      </div>
+                      <h1 className="text-lg font-bold hidden sm:block">
+                        Finance Dashboard
+                      </h1>
+                      <h1 className="text-base font-bold sm:hidden">Finance</h1>
+                    </div>
+
+                    {/* Navigation */}
+                    <Navbar />
+                  </div>
+
+                  {/* Right side - Actions */}
+                  <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="hidden sm:block">
+                      <NewWidgetDialog />
+                    </div>
+                    <div className="sm:hidden">
+                      <NewWidgetDialog />
+                    </div>
+                    <ThemeToggle />
+                  </div>
                 </div>
-                <h1 className={`text-lg font-bold`}>Finance Dashboard</h1>
-              </div>
-              <div className="flex items-center gap-4">
-                <NewWidgetDialog />
-                <ThemeToggle />
               </div>
             </header>
             {children}

@@ -107,7 +107,8 @@ export const WidgetsManager = () => {
         <DialogHeader>
           <DialogTitle>Manage Your Widgets</DialogTitle>
           <DialogDescription>
-            View and manage all your widgets. Hidden widgets can be restored or permanently deleted.
+            View and manage all your widgets. Hidden widgets can be restored or
+            permanently deleted.
           </DialogDescription>
         </DialogHeader>
 
@@ -119,17 +120,23 @@ export const WidgetsManager = () => {
                 Visible Widgets
               </h3>
               <span className="text-sm text-muted-foreground">
-                {visibleWidgets.length} widget{visibleWidgets.length !== 1 ? "s" : ""}
+                {visibleWidgets.length} widget
+                {visibleWidgets.length !== 1 ? "s" : ""}
               </span>
             </div>
-            
+
             <ConditionalRenderer isVisible={visibleWidgets.length === 0}>
-              <p className="text-muted-foreground text-sm">No visible widgets</p>
+              <p className="text-muted-foreground text-sm">
+                No visible widgets
+              </p>
             </ConditionalRenderer>
-            
+
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {visibleWidgets.map((widget) => (
-                <Card key={widget.id} className="p-3 border-green-200 dark:border-green-800">
+                <Card
+                  key={widget.id}
+                  className="p-3 border-green-200 dark:border-green-800"
+                >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       {getWidgetIcon(widget.type)}
@@ -156,11 +163,17 @@ export const WidgetsManager = () => {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="text-xs text-muted-foreground space-y-1">
-                    <p><span className="font-medium">Type:</span> {getWidgetTypeDisplay(widget.type)}</p>
+                    <p>
+                      <span className="font-medium">Type:</span>{" "}
+                      {getWidgetTypeDisplay(widget.type)}
+                    </p>
                     {widget.stockSymbol && (
-                      <p><span className="font-medium">Symbol:</span> {widget.stockSymbol}</p>
+                      <p>
+                        <span className="font-medium">Symbol:</span>{" "}
+                        {widget.stockSymbol}
+                      </p>
                     )}
                   </div>
                 </Card>
@@ -176,7 +189,8 @@ export const WidgetsManager = () => {
               </h3>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  {hiddenWidgets.length} widget{hiddenWidgets.length !== 1 ? "s" : ""}
+                  {hiddenWidgets.length} widget
+                  {hiddenWidgets.length !== 1 ? "s" : ""}
                 </span>
                 {hiddenWidgets.length > 0 && (
                   <div className="flex gap-1">
@@ -200,14 +214,17 @@ export const WidgetsManager = () => {
                 )}
               </div>
             </div>
-            
+
             <ConditionalRenderer isVisible={hiddenWidgets.length === 0}>
               <p className="text-muted-foreground text-sm">No hidden widgets</p>
             </ConditionalRenderer>
-            
+
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {hiddenWidgets.map((widget) => (
-                <Card key={widget.id} className="p-3 opacity-60 border-orange-200 dark:border-orange-800">
+                <Card
+                  key={widget.id}
+                  className="p-3 opacity-60 border-orange-200 dark:border-orange-800"
+                >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       {getWidgetIcon(widget.type)}
@@ -234,13 +251,22 @@ export const WidgetsManager = () => {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="text-xs text-muted-foreground space-y-1">
-                    <p><span className="font-medium">Type:</span> {getWidgetTypeDisplay(widget.type)}</p>
+                    <p>
+                      <span className="font-medium">Type:</span>{" "}
+                      {getWidgetTypeDisplay(widget.type)}
+                    </p>
                     {widget.stockSymbol && (
-                      <p><span className="font-medium">Symbol:</span> {widget.stockSymbol}</p>
+                      <p>
+                        <span className="font-medium">Symbol:</span>{" "}
+                        {widget.stockSymbol}
+                      </p>
                     )}
-                    <p><span className="font-medium">Hidden:</span> {new Date(widget.updatedAt).toLocaleDateString()}</p>
+                    <p>
+                      <span className="font-medium">Hidden:</span>{" "}
+                      {new Date(widget.updatedAt).toLocaleDateString()}
+                    </p>
                   </div>
                 </Card>
               ))}

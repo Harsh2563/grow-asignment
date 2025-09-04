@@ -9,9 +9,9 @@ interface DragHandleProps {
   isDragging?: boolean;
 }
 
-export const DragHandle: React.FC<DragHandleProps> = ({ 
-  className, 
-  isDragging = false 
+export const DragHandle: React.FC<DragHandleProps> = ({
+  className,
+  isDragging = false,
 }) => {
   return (
     <div

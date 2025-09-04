@@ -75,7 +75,10 @@ const widgetsSlice = createSlice({
       state.selectedWidgetId = action.payload;
     },
 
-    reorderWidgets: (state, action: PayloadAction<{ oldIndex: number; newIndex: number }>) => {
+    reorderWidgets: (
+      state,
+      action: PayloadAction<{ oldIndex: number; newIndex: number }>
+    ) => {
       const { oldIndex, newIndex } = action.payload;
       const [reorderedItem] = state.widgets.splice(oldIndex, 1);
       state.widgets.splice(newIndex, 0, reorderedItem);

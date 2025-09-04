@@ -9,11 +9,7 @@ import {
   Widget,
 } from "@/store/slices/widgetsSlice";
 import { Card } from "@/components/ui/card";
-import {
-  TrendingUp,
-  BarChart3,
-  Table,
-} from "lucide-react";
+import { TrendingUp, BarChart3, Table } from "lucide-react";
 import { ConditionalRenderer } from "@/ConditionalRenderer/ConditionalRenderer";
 import { FinanceTableWidget } from "@/components/finance-table-widget";
 import { StockChartWidget } from "@/components/charts/stock-chart-widget";
@@ -132,7 +128,7 @@ export const WidgetsList = () => {
               </p>
             )}
           </div>
-          
+
           <ConditionalRenderer isVisible={widgets.length > 0}>
             <WidgetsManager />
           </ConditionalRenderer>

@@ -38,11 +38,7 @@ export const SortableWidgetItem: React.FC<SortableWidgetItemProps> = ({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="relative group"
-    >
+    <div ref={setNodeRef} style={style} className="relative group">
       {/* Drag Handle */}
       <div className="absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
         <div
@@ -55,7 +51,11 @@ export const SortableWidgetItem: React.FC<SortableWidgetItemProps> = ({
       </div>
 
       {/* Widget Content */}
-      <div className={`${isDragging ? 'ring-2 ring-primary ring-opacity-50 rounded-lg' : ''}`}>
+      <div
+        className={`${
+          isDragging ? "ring-2 ring-primary ring-opacity-50 rounded-lg" : ""
+        }`}
+      >
         {children}
       </div>
 

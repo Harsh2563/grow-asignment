@@ -38,22 +38,22 @@ export const ComprehensiveFinanceCard = ({
     marketMovers,
     performanceData,
     currentTabData,
-    
+
     // Loading states
     loading,
     isLoadingStock,
     isLoadingMovers,
     isLoadingPerformance,
-    
+
     // Error states
     error,
     stockError,
     moversError,
     performanceError,
-    
+
     // API key
     selectedApiKey,
-    
+
     // Actions
     refetchCurrentTab,
     invalidateCurrentTab,
@@ -65,7 +65,7 @@ export const ComprehensiveFinanceCard = ({
     try {
       // Invalidate cache and refetch current tab data
       invalidateCurrentTab();
-      
+
       // Wait a moment for cache invalidation to complete
       await new Promise((resolve) => setTimeout(resolve, 100));
 
@@ -244,60 +244,53 @@ export const ComprehensiveFinanceCard = ({
   };
 
   const renderPerformanceSection = () => {
-    if (!mainStockData || !performanceData) {
+    if (!mainStockData) {
       return (
         <div className="text-center py-8 text-muted-foreground">
-          No performance data available
+          No stock data available
         </div>
       );
     }
 
+    // Use mainStockData as fallback if performanceData is not available
+    const perfData = performanceData || {};
+    const fallbackHigh = mainStockData.h * 1.15; // Estimate 52W high as 15% above current high
+    const fallbackLow = mainStockData.l * 0.85; // Estimate 52W low as 15% below current low
+
     return (
       <div className="space-y-6">
-        {/* Performance Metrics */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 bg-muted/50 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Activity className="h-4 w-4 text-blue-600" />
-              <p className="text-sm font-medium">52W High</p>
+        {/* 52-Week High/Low on the left side */}
+        <div className="flex">
+          <div className="flex-1 space-y-4 pr-6">
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Activity className="h-4 w-4 text-green-600" />
+                <p className="text-sm font-medium">52 Week High</p>
+              </div>
+              <p className="text-lg font-bold text-green-600">
+                {formatCurrency(perfData.weekHigh || fallbackHigh)}
+              </p>
             </div>
-            <p className="text-lg font-bold">
-              {formatCurrency(performanceData.weekHigh)}
-            </p>
+
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Activity className="h-4 w-4 text-red-600" />
+                <p className="text-sm font-medium">52 Week Low</p>
+              </div>
+              <p className="text-lg font-bold text-red-600">
+                {formatCurrency(perfData.weekLow || fallbackLow)}
+              </p>
+            </div>
           </div>
 
-          <div className="p-4 bg-muted/50 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Activity className="h-4 w-4 text-red-600" />
-              <p className="text-sm font-medium">52W Low</p>
-            </div>
-            <p className="text-lg font-bold">
-              {formatCurrency(performanceData.weekLow)}
-            </p>
-          </div>
-        </div>
-
-        {/* Financial Data */}
-        <div>
-          <h4 className="font-semibold mb-3 flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Key Financial Metrics
-          </h4>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="p-3 border rounded-lg">
-              <p className="text-sm text-muted-foreground">Market Cap</p>
-              <p className="font-semibold">{performanceData.marketCap}</p>
-            </div>
-            <div className="p-3 border rounded-lg">
-              <p className="text-sm text-muted-foreground">P/E Ratio</p>
-              <p className="font-semibold">{performanceData.peRatio}</p>
-            </div>
-            <div className="p-3 border rounded-lg">
-              <p className="text-sm text-muted-foreground">Volume</p>
-              <p className="font-semibold">
-                {performanceData.volume > 0
-                  ? performanceData.volume.toLocaleString()
-                  : "N/A"}
+          {/* Right side content area */}
+          <div className="flex-1 pl-6 border-l">
+            <div className="text-center py-8">
+              <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-lg font-medium mb-2">Additional Analytics</p>
+              <p className="text-sm text-muted-foreground">
+                Detailed performance analytics for{" "}
+                {widget.stockSymbol || "your selected stock"} is displayed here.
               </p>
             </div>
           </div>

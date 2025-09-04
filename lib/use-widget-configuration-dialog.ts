@@ -66,7 +66,10 @@ export const useWidgetConfigurationDialog = (
   };
 
   // Handle updating widget
-  const handleUpdateWidget = (e: React.FormEvent, onOpenChange: (open: boolean) => void) => {
+  const handleUpdateWidget = (
+    e: React.FormEvent,
+    onOpenChange: (open: boolean) => void
+  ) => {
     e.preventDefault();
 
     if (!widget || !validateForm()) {
@@ -102,7 +105,7 @@ export const useWidgetConfigurationDialog = (
     }
 
     addApiKey(newKeyName, newKeyValue);
-    
+
     // Find the newly added key by name
     setTimeout(() => {
       const newlyAddedKey = apiKeys.find((key) => key.name === newKeyName);

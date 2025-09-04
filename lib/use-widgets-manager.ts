@@ -1,6 +1,9 @@
 import { useState, useMemo } from "react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { deleteWidget, toggleWidgetVisibility } from "@/store/slices/widgetsSlice";
+import {
+  deleteWidget,
+  toggleWidgetVisibility,
+} from "@/store/slices/widgetsSlice";
 
 export const useWidgetsManager = () => {
   const dispatch = useAppDispatch();

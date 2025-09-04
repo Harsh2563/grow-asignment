@@ -63,7 +63,7 @@ export const useFinanceTableWidget = (
   // Filter stocks based on search query
   const filteredStocks = useMemo(() => {
     if (!searchQuery.trim()) return stocksData;
-    
+
     const query = searchQuery.toLowerCase().trim();
     return stocksData.filter(
       (stock) =>
@@ -95,8 +95,8 @@ export const useFinanceTableWidget = (
   // Handle search result
   useEffect(() => {
     if (searchResult && shouldSearch) {
-      setSearchedStocks(prev => new Set([...prev, currentSearchTerm]));
-      setSearchedStocksData(prev => [...prev, searchResult]);
+      setSearchedStocks((prev) => new Set([...prev, currentSearchTerm]));
+      setSearchedStocksData((prev) => [...prev, searchResult]);
       setShouldSearch(false);
       setCurrentSearchTerm("");
     }
@@ -104,13 +104,13 @@ export const useFinanceTableWidget = (
 
   // Handle removing searched stock
   const handleRemoveSearchedStock = (symbol: string) => {
-    setSearchedStocks(prev => {
+    setSearchedStocks((prev) => {
       const newSet = new Set(prev);
       newSet.delete(symbol);
       return newSet;
     });
-    setSearchedStocksData(prev => 
-      prev.filter(stock => stock.symbol !== symbol)
+    setSearchedStocksData((prev) =>
+      prev.filter((stock) => stock.symbol !== symbol)
     );
   };
 
@@ -136,27 +136,27 @@ export const useFinanceTableWidget = (
     searchQuery,
     setSearchQuery,
     searchedStocks,
-    
+
     // Pagination states
     currentPage,
     totalPages,
     currentStocks,
-    
+
     // Data states
     stocksData: filteredStocks,
     loading,
     error,
-    
+
     // Handlers
     handleSearch,
     handleRemoveSearchedStock,
     handleClearSearch,
     handlePageChange,
-    
+
     // Data refetch
     refetchPopular,
     invalidatePopularStocks,
-    
+
     // Constants
     ITEMS_PER_PAGE,
   };

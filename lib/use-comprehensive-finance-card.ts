@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as React from "react";
 import { useAppSelector } from "@/store/hooks";
 import { Widget } from "@/store/slices/widgetsSlice";
 import {
@@ -38,6 +39,16 @@ export const useComprehensiveFinanceCard = (widget: Widget) => {
     error: performanceError,
     refetch: refetchPerformance,
   } = useStockPerformance(widget.stockSymbol || "", selectedApiKey || null);
+
+  // Debug performance data
+  React.useEffect(() => {
+    if (performanceData) {
+      console.log("Performance data received:", performanceData);
+    }
+    if (performanceError) {
+      console.log("Performance error:", performanceError);
+    }
+  }, [performanceData, performanceError]);
 
   const { invalidateStock, invalidateMarketMovers, invalidatePerformance } =
     useInvalidateQueries();
@@ -110,7 +121,7 @@ export const useComprehensiveFinanceCard = (widget: Widget) => {
   // Invalidate current tab data
   const invalidateCurrentTab = () => {
     if (!selectedApiKey) return;
-    
+
     switch (activeTab) {
       case "main":
         invalidateStock(widget.stockSymbol || "", selectedApiKey.id);
@@ -134,22 +145,22 @@ export const useComprehensiveFinanceCard = (widget: Widget) => {
     marketMovers,
     performanceData,
     currentTabData,
-    
+
     // Loading states
     loading,
     isLoadingStock,
     isLoadingMovers,
     isLoadingPerformance,
-    
+
     // Error states
     error,
     stockError,
     moversError,
     performanceError,
-    
+
     // API key
     selectedApiKey,
-    
+
     // Actions
     refetchCurrentTab,
     invalidateCurrentTab,

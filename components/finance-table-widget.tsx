@@ -49,27 +49,27 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
     searchQuery,
     setSearchQuery,
     searchedStocks,
-    
+
     // Pagination states
     currentPage,
     totalPages,
     currentStocks,
-    
+
     // Data states
     stocksData,
     loading,
     error,
-    
+
     // Handlers
     handleSearch,
     handleRemoveSearchedStock,
     handleClearSearch,
     handlePageChange,
-    
+
     // Data refetch
     refetchPopular,
     invalidatePopularStocks,
-    
+
     // Constants
     ITEMS_PER_PAGE,
   } = useFinanceTableWidget(selectedApiKey, widget.refreshInterval);
@@ -93,7 +93,9 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
         {loading && stocksData.length === 0 ? (
           <div className="flex items-center justify-center py-8">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-muted-foreground">Loading stocks...</span>
+            <span className="ml-2 text-muted-foreground">
+              Loading stocks...
+            </span>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center py-8 text-destructive">

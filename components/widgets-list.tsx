@@ -8,12 +8,8 @@ import {
   reorderWidgets,
   Widget,
 } from "@/store/slices/widgetsSlice";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  Trash2,
-  Eye,
-  EyeOff,
   TrendingUp,
   BarChart3,
   Table,
@@ -35,37 +31,10 @@ import {
   DragEndEvent,
 } from "@dnd-kit/core";
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-
-const getWidgetIcon = (type: string) => {
-  switch (type) {
-    case "chart":
-      return <TrendingUp className="h-4 w-4" />;
-    case "table":
-      return <Table className="h-4 w-4" />;
-    case "card":
-      return <BarChart3 className="h-4 w-4" />;
-    default:
-      return <BarChart3 className="h-4 w-4" />;
-  }
-};
-
-const getWidgetTypeDisplay = (type: string) => {
-  switch (type) {
-    case "chart":
-      return "Chart Widget";
-    case "table":
-      return "Table Widget";
-    case "card":
-      return "Card Widget";
-    default:
-      return "Widget";
-  }
-};
 
 export const WidgetsList = () => {
   const dispatch = useAppDispatch();
@@ -84,7 +53,6 @@ export const WidgetsList = () => {
   );
 
   const visibleWidgets = widgets.filter((widget) => widget.isVisible);
-  const hiddenWidgets = widgets.filter((widget) => !widget.isVisible);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;

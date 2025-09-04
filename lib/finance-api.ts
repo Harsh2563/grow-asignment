@@ -237,7 +237,7 @@ export const fetchMarketMovers = async (
 
     if (result.success && result.data) {
       const gainersData: StockData[] = (result.data.top_gainers || []).map(
-        (item: any) => ({
+        (item: { symbol: string; price: string; change_amount: string }) => ({
           symbol: item.symbol,
           c: parseFloat(item.price),
           h: parseFloat(item.price) * 1.02,
@@ -249,7 +249,7 @@ export const fetchMarketMovers = async (
       );
 
       const losersData: StockData[] = (result.data.top_losers || []).map(
-        (item: any) => ({
+        (item: { symbol: string; price: string; change_amount: string }) => ({
           symbol: item.symbol,
           c: parseFloat(item.price),
           h: parseFloat(item.price) * 1.02,

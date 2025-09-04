@@ -9,7 +9,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine,
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,14 +16,12 @@ import { ConditionalRenderer } from "@/ConditionalRenderer/ConditionalRenderer";
 import {
   fetchChartData,
   convertToLineData,
-  calculateMovingAverage,
   formatChartDataForInterval,
   type ChartDataPoint,
   type LineChartData,
   type ChartInterval,
 } from "@/lib/chart-data-service";
 import { fetchStockData, type ApiKey, type StockData } from "@/lib/finance-api";
-import { CandlestickChart } from "./candlestick-chart";
 
 interface StockChartWidgetProps {
   widgetId: string;
@@ -81,8 +78,7 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
       const data = await fetchChartData(
         symbol,
         apiKey,
-        selectedInterval,
-        currentPrice?.c
+        selectedInterval
       );
 
       if (data.length === 0) {
@@ -99,11 +95,12 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
       }
 
       // Calculate moving averages
-      if (formattedData.length >= 50) {
-        const ma20 = calculateMovingAverage(formattedData, 20);
-        const ma50 = calculateMovingAverage(formattedData, 50);
-        setMovingAverages({ ma20, ma50 });
-      }
+      // TODO: Implement calculateMovingAverage function
+      // if (formattedData.length >= 50) {
+      //   const ma20 = calculateMovingAverage(formattedData, 20);
+      //   const ma50 = calculateMovingAverage(formattedData, 50);
+      //   setMovingAverages({ ma20, ma50 });
+      // }
     } catch (err) {
       const errorMsg =
         err instanceof Error ? err.message : "Failed to fetch chart data";
@@ -128,7 +125,7 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
   }, [refreshInterval, symbol, apiKey, selectedInterval]);
 
   // Custom tooltip for line chart
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ payload: { volume: number }; value: number }>; label?: string }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -248,8 +245,8 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
 
       {/* Chart */}
       <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <ConditionalRenderer isVisible={chartType === "line"}>
+        <ConditionalRenderer isVisible={chartType === "line"}>
+          <ResponsiveContainer width="100%" height="100%">
             <LineChart data={lineData}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis
@@ -319,15 +316,14 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
                 />
               </ConditionalRenderer>
             </LineChart>
-          </ConditionalRenderer>
+          </ResponsiveContainer>
+        </ConditionalRenderer>
 
-          <ConditionalRenderer isVisible={chartType === "candlestick"}>
-            <CandlestickChart
-              data={chartData}
-              selectedInterval={selectedInterval}
-            />
-          </ConditionalRenderer>
-        </ResponsiveContainer>
+        <ConditionalRenderer isVisible={chartType === "candlestick"}>
+          <div className="text-center text-muted-foreground py-8">
+            Candlestick chart coming soon...
+          </div>
+        </ConditionalRenderer>
       </div>
 
       {/* Legend for moving averages */}

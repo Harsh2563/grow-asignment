@@ -4,9 +4,10 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import {
   deleteWidget,
   toggleWidgetVisibility,
+  Widget,
 } from "@/store/slices/widgetsSlice";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   Trash2,
   Eye,
@@ -66,7 +67,7 @@ export const WidgetsList = () => {
     return apiKeys.find((key) => key.id === apiKeyId);
   };
 
-  const renderWidget = (widget: any) => {
+  const renderWidget = (widget: Widget) => {
     const apiKey = getApiKeyForWidget(widget.apiKeyId);
 
     if (!apiKey) {

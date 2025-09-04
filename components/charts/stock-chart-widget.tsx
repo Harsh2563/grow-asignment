@@ -9,7 +9,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine,
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -105,7 +104,7 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
   }, [refreshInterval, symbol, apiKey, selectedInterval]);
 
   // Custom tooltip for line chart
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ payload: { volume: number }; value: number }>; label?: string }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (

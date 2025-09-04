@@ -97,8 +97,14 @@ export const NewWidgetDialog = () => {
       return;
     }
 
-    const newKey = addApiKey(newKeyName, newKeyValue);
-    setSelectedApiKeyId(newKey.id);
+    addApiKey(newKeyName, newKeyValue);
+    // Find the newly added key by name
+    setTimeout(() => {
+      const newlyAddedKey = apiKeys.find(key => key.name === newKeyName);
+      if (newlyAddedKey) {
+        setSelectedApiKeyId(newlyAddedKey.id);
+      }
+    }, 100);
 
     setNewKeyName("");
     setNewKeyValue("");

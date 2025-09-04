@@ -36,8 +36,9 @@ export function useApiKeys() {
       key,
       provider,
     };
-    dispatch(addApiKeyAction(newKey));
-
+    const result = dispatch(addApiKeyAction(newKey));
+    
+    // Return a basic object - the component will find the actual key from the store
     return { name, key, provider };
   };
 

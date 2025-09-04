@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,117 +12,46 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Plus as PlusIcon } from "lucide-react";
-import { useApiKeys } from "@/lib/use-api-keys";
 import { ApiKeySelector } from "@/components/api-key-selector";
 import { WidgetFormFields } from "@/components/widget-form-fields";
 import { AddApiKeyDialog } from "@/components/add-api-key-dialog";
-import { useAppDispatch } from "@/store/hooks";
-import { addWidget } from "@/store/slices/widgetsSlice";
+import { useNewWidgetDialog } from "@/lib/use-new-widget-dialog";
 
 export const NewWidgetDialog = () => {
-  const dispatch = useAppDispatch();
-  const [isWidgetDialogOpen, setIsWidgetDialogOpen] = useState(false);
-  const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
-  const [widgetName, setWidgetName] = useState("");
-  const [widgetType, setWidgetType] = useState("");
-  const [stockSymbol, setStockSymbol] = useState("");
-  const [chartType, setChartType] = useState("");
-  const [refreshInterval, setRefreshInterval] = useState("60");
-  const [selectedApiKeyId, setSelectedApiKeyId] = useState<string | null>(null);
-  const [newKeyName, setNewKeyName] = useState("");
-  const [newKeyValue, setNewKeyValue] = useState("");
-  const [newKeyProvider, setNewKeyProvider] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const { apiKeys, addApiKey } = useApiKeys();
+  const {
+    // States
+    isWidgetDialogOpen,
+    setIsWidgetDialogOpen,
+    isApiKeyDialogOpen,
+    widgetName,
+    setWidgetName,
+    widgetType,
+    setWidgetType,
+    stockSymbol,
+    setStockSymbol,
+    chartType,
+    setChartType,
+    refreshInterval,
+    setRefreshInterval,
+    selectedApiKeyId,
+    setSelectedApiKeyId,
+    newKeyName,
+    setNewKeyName,
+    newKeyValue,
+    setNewKeyValue,
+    newKeyProvider,
+    setNewKeyProvider,
+    errorMessage,
+    apiKeys,
+    selectedApiKey,
 
-  const handleAddWidget = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Basic validation
-    if (!widgetName.trim()) {
-      setErrorMessage("Widget name is required");
-      return;
-    }
-
-    if (!widgetType) {
-      setErrorMessage("Please select a widget type");
-      return;
-    }
-
-    if (widgetType !== "table" && !stockSymbol.trim()) {
-      setErrorMessage("Stock symbol is required");
-      return;
-    }
-
-    if (!selectedApiKeyId) {
-      setErrorMessage("Please select an API key");
-      return;
-    }
-
-    // Create widget and save to Redux store
-    const newWidget = {
-      name: widgetName,
-      type: widgetType as "table" | "card" | "chart",
-      stockSymbol: widgetType === "table" ? "" : stockSymbol, // Empty for table widgets
-      chartType: widgetType === "chart" ? (chartType as "line") : undefined,
-      cardType: widgetType === "card" ? ("comprehensive" as const) : undefined,
-      refreshInterval: parseInt(refreshInterval),
-      apiKeyId: selectedApiKeyId,
-      isVisible: true,
-    };
-
-    // Dispatch to Redux store
-    dispatch(addWidget(newWidget));
-
-    // Reset form
-    setWidgetName("");
-    setWidgetType("");
-    setStockSymbol("");
-    setChartType("");
-    setRefreshInterval("60");
-    setSelectedApiKeyId(null);
-    setErrorMessage("");
-    setIsWidgetDialogOpen(false);
-  };
-
-  const handleAddNewKeyFromWidget = () => {
-    setIsWidgetDialogOpen(false);
-    setIsApiKeyDialogOpen(true);
-  };
-
-  const handleAddNewKey = () => {
-    if (!newKeyName.trim() || !newKeyValue.trim()) {
-      setErrorMessage("Both name and value are required");
-      return;
-    }
-
-    addApiKey(newKeyName, newKeyValue);
-    // Find the newly added key by name
-    setTimeout(() => {
-      const newlyAddedKey = apiKeys.find(key => key.name === newKeyName);
-      if (newlyAddedKey) {
-        setSelectedApiKeyId(newlyAddedKey.id);
-      }
-    }, 100);
-
-    setNewKeyName("");
-    setNewKeyValue("");
-    setNewKeyProvider("");
-    setErrorMessage("");
-    setIsApiKeyDialogOpen(false);
-    setIsWidgetDialogOpen(true);
-  };
-
-  const handleCancelAddKey = () => {
-    setNewKeyName("");
-    setNewKeyValue("");
-    setNewKeyProvider("");
-    setErrorMessage("");
-    setIsApiKeyDialogOpen(false);
-    setIsWidgetDialogOpen(true);
-  };
-
-  const selectedApiKey = apiKeys.find((key) => key.id === selectedApiKeyId);
+    // Handlers
+    handleAddWidget,
+    handleAddNewKeyFromWidget,
+    handleAddNewKey,
+    handleCancelAddKey,
+    handleApiKeyDialogChange,
+  } = useNewWidgetDialog();
 
   return (
     <>
@@ -202,12 +130,7 @@ export const NewWidgetDialog = () => {
       {/* API Key Dialog */}
       <AddApiKeyDialog
         isOpen={isApiKeyDialogOpen}
-        onOpenChange={(open) => {
-          if (!open) {
-            setIsApiKeyDialogOpen(false);
-            setIsWidgetDialogOpen(true);
-          }
-        }}
+        onOpenChange={handleApiKeyDialogChange}
         keyName={newKeyName}
         keyValue={newKeyValue}
         provider={newKeyProvider}

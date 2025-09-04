@@ -74,6 +74,12 @@ const widgetsSlice = createSlice({
     selectWidget: (state, action: PayloadAction<string | null>) => {
       state.selectedWidgetId = action.payload;
     },
+
+    reorderWidgets: (state, action: PayloadAction<{ oldIndex: number; newIndex: number }>) => {
+      const { oldIndex, newIndex } = action.payload;
+      const [reorderedItem] = state.widgets.splice(oldIndex, 1);
+      state.widgets.splice(newIndex, 0, reorderedItem);
+    },
   },
 });
 
@@ -83,6 +89,7 @@ export const {
   deleteWidget,
   toggleWidgetVisibility,
   selectWidget,
+  reorderWidgets,
 } = widgetsSlice.actions;
 
 export default widgetsSlice.reducer;

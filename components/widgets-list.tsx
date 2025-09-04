@@ -1,9 +1,11 @@
 "use client";
 
+import React from "react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import {
   deleteWidget,
   toggleWidgetVisibility,
+  reorderWidgets,
   Widget,
 } from "@/store/slices/widgetsSlice";
 import { Button } from "@/components/ui/button";
@@ -20,7 +22,24 @@ import { ConditionalRenderer } from "@/ConditionalRenderer/ConditionalRenderer";
 import { FinanceTableWidget } from "@/components/finance-table-widget";
 import { StockChartWidget } from "@/components/charts/stock-chart-widget";
 import { ComprehensiveFinanceCard } from "@/components/comprehensive-finance-card";
+import { SortableWidgetItem } from "@/components/sortable-widget-item";
+import { WidgetsManager } from "@/components/widgets-manager";
 import { useApiKeys } from "@/lib/use-api-keys";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 const getWidgetIcon = (type: string) => {
   switch (type) {
@@ -52,6 +71,33 @@ export const WidgetsList = () => {
   const dispatch = useAppDispatch();
   const widgets = useAppSelector((state) => state.widgets.widgets);
   const { apiKeys } = useApiKeys();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const visibleWidgets = widgets.filter((widget) => widget.isVisible);
+  const hiddenWidgets = widgets.filter((widget) => !widget.isVisible);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      const oldIndex = widgets.findIndex((widget) => widget.id === active.id);
+      const newIndex = widgets.findIndex((widget) => widget.id === over?.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        dispatch(reorderWidgets({ oldIndex, newIndex }));
+      }
+    }
+  };
 
   const handleDeleteWidget = (id: string) => {
     if (confirm("Are you sure you want to delete this widget?")) {
@@ -105,11 +151,24 @@ export const WidgetsList = () => {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-3xl font-bold tracking-tight">Your Widgets</h2>
-        <p className="text-muted-foreground mt-2">
-          {widgets.length} widget{widgets.length !== 1 ? "s" : ""} in your
-          dashboard
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Your Widgets</h2>
+            <p className="text-muted-foreground mt-2">
+              {widgets.length} widget{widgets.length !== 1 ? "s" : ""} in your
+              dashboard
+            </p>
+            {visibleWidgets.length > 0 && (
+              <p className="text-xs text-muted-foreground mt-1">
+                💡 Hover over widgets to see drag handles and controls
+              </p>
+            )}
+          </div>
+          
+          <ConditionalRenderer isVisible={widgets.length > 0}>
+            <WidgetsManager />
+          </ConditionalRenderer>
+        </div>
       </div>
 
       <ConditionalRenderer isVisible={widgets.length === 0}>
@@ -126,37 +185,31 @@ export const WidgetsList = () => {
         </div>
       </ConditionalRenderer>
 
-      <ConditionalRenderer isVisible={widgets.length > 0}>
-        <div className="space-y-6">
-          {widgets
-            .filter((widget) => widget.isVisible)
-            .map((widget) => (
-              <div key={widget.id} className="relative group">
-                {renderWidget(widget)}
-                <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleToggleVisibility(widget.id)}
-                    className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm border shadow-sm hover:bg-background"
+      <ConditionalRenderer isVisible={visibleWidgets.length > 0}>
+        <div className="pl-8">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={visibleWidgets.map((widget) => widget.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-6">
+                {visibleWidgets.map((widget) => (
+                  <SortableWidgetItem
+                    key={widget.id}
+                    widget={widget}
+                    onDelete={handleDeleteWidget}
+                    onToggleVisibility={handleToggleVisibility}
                   >
-                    {widget.isVisible ? (
-                      <Eye className="h-4 w-4" />
-                    ) : (
-                      <EyeOff className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDeleteWidget(widget.id)}
-                    className="h-8 w-8 p-0 bg-red-500/90 backdrop-blur-sm shadow-sm hover:bg-red-600"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                    {renderWidget(widget)}
+                  </SortableWidgetItem>
+                ))}
               </div>
-            ))}
+            </SortableContext>
+          </DndContext>
         </div>
       </ConditionalRenderer>
     </div>

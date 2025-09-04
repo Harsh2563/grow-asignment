@@ -10,7 +10,7 @@ interface CacheItem<T> {
 }
 
 class CacheService {
-  private cache = new Map<string, CacheItem<any>>();
+  private cache = new Map<string, CacheItem<unknown>>();
   private maxSize = 1000; // Maximum cache entries
 
   /**
@@ -33,7 +33,7 @@ class CacheService {
    * Get data from cache if valid
    */
   get<T>(key: string): T | null {
-    const item = this.cache.get(key);
+    const item = this.cache.get(key) as CacheItem<T> | undefined;
 
     if (!item) {
       return null;
@@ -55,7 +55,9 @@ class CacheService {
     // Remove oldest entries if cache is full
     if (this.cache.size >= this.maxSize) {
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey) {
+        this.cache.delete(firstKey);
+      }
     }
 
     this.cache.set(key, {
@@ -152,7 +154,7 @@ export const cacheService = new CacheService();
 /**
  * Cache decorator for API functions
  */
-export function withCache<T extends any[], R>(
+export function withCache<T extends unknown[], R>(
   fn: (...args: T) => Promise<R>,
   keyGenerator: (...args: T) => string,
   ttlInSeconds: number

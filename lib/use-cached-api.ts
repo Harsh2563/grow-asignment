@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { ApiKey, StockData } from "./finance-api";
 
 interface CacheEntry<T> {
-  data: T;
+  data: T | null;
   timestamp: number;
   isLoading: boolean;
   error: string | null;
@@ -16,11 +16,11 @@ interface UseCachedApiOptions {
 }
 
 class ClientCacheManager {
-  private cache = new Map<string, CacheEntry<any>>();
+  private cache = new Map<string, CacheEntry<unknown>>();
   private subscribers = new Map<string, Set<() => void>>();
 
   get<T>(key: string): CacheEntry<T> | null {
-    return this.cache.get(key) || null;
+    return (this.cache.get(key) as CacheEntry<T>) || null;
   }
 
   set<T>(key: string, entry: CacheEntry<T>): void {
@@ -164,7 +164,7 @@ export function useCachedStockData(
           err instanceof Error ? err.message : "Unknown error";
 
         const cacheEntry: CacheEntry<StockData> = {
-          data: cached?.data || (null as any),
+          data: cached?.data || null,
           timestamp: now,
           isLoading: false,
           error: errorMessage,

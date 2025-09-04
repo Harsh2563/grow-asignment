@@ -26,11 +26,9 @@ interface WidgetConfigurationDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const WidgetConfigurationDialog: React.FC<WidgetConfigurationDialogProps> = ({
-  widget,
-  isOpen,
-  onOpenChange,
-}) => {
+export const WidgetConfigurationDialog: React.FC<
+  WidgetConfigurationDialogProps
+> = ({ widget, isOpen, onOpenChange }) => {
   const dispatch = useAppDispatch();
   const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
   const [widgetName, setWidgetName] = useState("");
@@ -73,14 +71,16 @@ export const WidgetConfigurationDialog: React.FC<WidgetConfigurationDialogProps>
     }
 
     // Update widget
-    dispatch(updateWidget({
-      id: widget.id,
-      updates: {
-        name: widgetName,
-        refreshInterval: intervalValue,
-        apiKeyId: selectedApiKeyId,
-      }
-    }));
+    dispatch(
+      updateWidget({
+        id: widget.id,
+        updates: {
+          name: widgetName,
+          refreshInterval: intervalValue,
+          apiKeyId: selectedApiKeyId,
+        },
+      })
+    );
 
     setErrorMessage("");
     onOpenChange(false);
@@ -99,7 +99,7 @@ export const WidgetConfigurationDialog: React.FC<WidgetConfigurationDialogProps>
     addApiKey(newKeyName, newKeyValue);
     // Find the newly added key by name
     setTimeout(() => {
-      const newlyAddedKey = apiKeys.find(key => key.name === newKeyName);
+      const newlyAddedKey = apiKeys.find((key) => key.name === newKeyName);
       if (newlyAddedKey) {
         setSelectedApiKeyId(newlyAddedKey.id);
       }
@@ -142,8 +142,9 @@ export const WidgetConfigurationDialog: React.FC<WidgetConfigurationDialogProps>
               Configure Widget
             </DialogTitle>
             <DialogDescription>
-              Update the widget name, API key, and refresh interval for "{widget?.name}".
-              Other widget properties are fixed and cannot be changed.
+              Update the widget name, API key, and refresh interval for &quot;
+              {widget?.name}&quot;. Other widget properties are fixed and cannot
+              be changed.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdateWidget}>
@@ -173,24 +174,32 @@ export const WidgetConfigurationDialog: React.FC<WidgetConfigurationDialogProps>
                 <div className="bg-muted/30 p-3 rounded-md space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Type:</span>
-                    <span className="capitalize font-medium">{widget?.type}</span>
+                    <span className="capitalize font-medium">
+                      {widget?.type}
+                    </span>
                   </div>
                   {widget?.stockSymbol && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Stock Symbol:</span>
+                      <span className="text-muted-foreground">
+                        Stock Symbol:
+                      </span>
                       <span className="font-medium">{widget.stockSymbol}</span>
                     </div>
                   )}
                   {widget?.chartType && (
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Chart Type:</span>
-                      <span className="capitalize font-medium">{widget.chartType}</span>
+                      <span className="capitalize font-medium">
+                        {widget.chartType}
+                      </span>
                     </div>
                   )}
                   {widget?.cardType && (
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Card Type:</span>
-                      <span className="capitalize font-medium">{widget.cardType}</span>
+                      <span className="capitalize font-medium">
+                        {widget.cardType}
+                      </span>
                     </div>
                   )}
                 </div>

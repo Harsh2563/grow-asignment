@@ -4,7 +4,7 @@ export interface ApiKey {
   id: string;
   name: string;
   key: string;
-  provider?: 'finnhub';
+  provider?: "nseindia";
   createdAt: string;
   lastUsed?: string;
   isValid?: boolean;
@@ -39,7 +39,10 @@ const apiKeysSlice = createSlice({
 
     updateApiKey: (
       state,
-      action: PayloadAction<{ id: string; updates: Partial<Omit<ApiKey, "id" | "createdAt">> }>
+      action: PayloadAction<{
+        id: string;
+        updates: Partial<Omit<ApiKey, "id" | "createdAt">>;
+      }>
     ) => {
       const { id, updates } = action.payload;
       const keyIndex = state.apiKeys.findIndex((key) => key.id === id);
@@ -56,7 +59,9 @@ const apiKeysSlice = createSlice({
     },
 
     recordKeyUsage: (state, action: PayloadAction<string>) => {
-      const keyIndex = state.apiKeys.findIndex((key) => key.id === action.payload);
+      const keyIndex = state.apiKeys.findIndex(
+        (key) => key.id === action.payload
+      );
       if (keyIndex !== -1) {
         state.apiKeys[keyIndex].lastUsed = new Date().toISOString();
       }
@@ -83,7 +88,7 @@ const apiKeysSlice = createSlice({
     },
 
     setSelectedApiKey: (state, action: PayloadAction<string>) => {
-      const keyExists = state.apiKeys.find(key => key.id === action.payload);
+      const keyExists = state.apiKeys.find((key) => key.id === action.payload);
       if (keyExists) {
         state.selectedApiKeyId = action.payload;
       }

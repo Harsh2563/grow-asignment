@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { ConditionalRenderer } from "@/ConditionalRenderer/ConditionalRenderer";
 import { FinanceTableWidget } from "@/components/finance-table-widget";
+import { StockChartWidget } from "@/components/charts/stock-chart-widget";
+import { useApiKeys } from "@/lib/use-api-keys";
 
 const getWidgetIcon = (type: string) => {
   switch (type) {
@@ -47,6 +49,7 @@ const getWidgetTypeDisplay = (type: string) => {
 export const WidgetsList = () => {
   const dispatch = useAppDispatch();
   const widgets = useAppSelector((state) => state.widgets.widgets);
+  const { apiKeys } = useApiKeys();
 
   const handleDeleteWidget = (id: string) => {
     if (confirm("Are you sure you want to delete this widget?")) {
@@ -56,6 +59,42 @@ export const WidgetsList = () => {
 
   const handleToggleVisibility = (id: string) => {
     dispatch(toggleWidgetVisibility(id));
+  };
+
+  const getApiKeyForWidget = (apiKeyId: string) => {
+    return apiKeys.find(key => key.id === apiKeyId);
+  };
+
+  const renderWidget = (widget: any) => {
+    const apiKey = getApiKeyForWidget(widget.apiKeyId);
+    
+    if (!apiKey) {
+      return (
+        <Card key={widget.id} className="p-6">
+          <div className="text-center text-destructive">
+            API key not found for this widget
+          </div>
+        </Card>
+      );
+    }
+
+    switch (widget.type) {
+      case 'table':
+        return <FinanceTableWidget key={widget.id} widget={widget} />;
+      
+      case 'chart':
+        return (
+          <StockChartWidget
+            key={widget.id}
+            widgetId={widget.id}
+            symbol={widget.stockSymbol}
+            chartType="line"
+            apiKey={apiKey}
+            refreshInterval={widget.refreshInterval}
+            onError={(error) => console.error(`Chart widget error: ${error}`)}
+          />
+        );
+    }
   };
 
   return (
@@ -85,10 +124,10 @@ export const WidgetsList = () => {
       <ConditionalRenderer isVisible={widgets.length > 0}>
         <div className="space-y-6">
           {widgets
-            .filter((widget) => widget.type === "table")
+            .filter((widget) => widget.isVisible)
             .map((widget) => (
               <div key={widget.id} className="relative group">
-                <FinanceTableWidget widget={widget} />
+                {renderWidget(widget)}
                 <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
                   <Button
                     variant="secondary"

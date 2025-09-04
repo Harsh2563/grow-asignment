@@ -5,7 +5,7 @@ interface ApiKey {
   id: string;
   name: string;
   key: string;
-  provider?: 'finnhub';
+  provider?: "nseindia";
   createdAt: string;
   lastUsed?: string;
   isValid?: boolean;
@@ -22,7 +22,7 @@ export class ApiKeysManager {
    * @param provider The financial data provider (optional)
    * @returns The newly created API key object
    */
-  static addApiKey(name: string, key: string, provider?: 'finnhub'): ApiKey {
+  static addApiKey(name: string, key: string, provider?: "nseindia"): ApiKey {
     const apiKeys = this.getApiKeys();
 
     const newApiKey: ApiKey = {
@@ -148,7 +148,7 @@ export class ApiKeysManager {
    * @returns Array of valid API key objects
    */
   static getValidApiKeys(): ApiKey[] {
-    return this.getApiKeys().filter(key => key.isValid === true);
+    return this.getApiKeys().filter((key) => key.isValid === true);
   }
 
   /**
@@ -156,7 +156,7 @@ export class ApiKeysManager {
    * @returns Array of untested API key objects
    */
   static getUntestedApiKeys(): ApiKey[] {
-    return this.getApiKeys().filter(key => key.isValid === undefined);
+    return this.getApiKeys().filter((key) => key.isValid === undefined);
   }
 
   /**

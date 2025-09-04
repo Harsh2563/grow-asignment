@@ -31,9 +31,9 @@ export const NewApiKeyForm = ({
       <div className="grid gap-2">
         <Label htmlFor="provider">Provider</Label>
         <div className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background items-center">
-          <span className="text-foreground">Finnhub</span>
+          <span className="text-foreground">NSE India</span>
         </div>
-        <input type="hidden" value="finnhub" />
+        <input type="hidden" value="nseindia" />
       </div>
       <div className="grid gap-2">
         <Label htmlFor="new-key-name">API Key Name</Label>
@@ -41,7 +41,7 @@ export const NewApiKeyForm = ({
           id="new-key-name"
           value={keyName}
           onChange={(e) => onKeyNameChange(e.target.value)}
-          placeholder="e.g., Alpha Vantage API Key"
+          placeholder="e.g., NSE India API Key"
           disabled={isLoading}
         />
       </div>
@@ -68,9 +68,7 @@ export const NewApiKeyForm = ({
         <Button
           type="button"
           onClick={onSave}
-          disabled={
-            isLoading || !keyName.trim() || !keyValue.trim()
-          }
+          disabled={isLoading || !keyName.trim() || !keyValue.trim()}
         >
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {isLoading ? "Testing Key..." : "Save Key"}

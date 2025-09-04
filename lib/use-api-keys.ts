@@ -30,7 +30,7 @@ export function useApiKeys() {
     }
   }, [dispatch, selectedApiKeyId, apiKeys]);
 
-  const addApiKey = (name: string, key: string, provider?: "finnhub") => {
+  const addApiKey = (name: string, key: string, provider?: "nseindia") => {
     const newKey = {
       name,
       key,

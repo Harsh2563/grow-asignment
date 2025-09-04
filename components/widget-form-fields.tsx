@@ -65,7 +65,7 @@ export const WidgetFormFields = ({
       {/* Stock Symbol - Disabled for table widgets */}
       <div className="grid gap-3">
         <Label htmlFor="stock-symbol">Stock Symbol</Label>
-        {widgetType === 'table' ? (
+        {widgetType === "table" ? (
           <div className="space-y-2">
             <Input
               id="stock-symbol"
@@ -92,7 +92,7 @@ export const WidgetFormFields = ({
       </div>
 
       {/* Chart Type - Only show for chart widgets */}
-      <ConditionalRenderer isVisible={widgetType === 'chart'}>
+      <ConditionalRenderer isVisible={widgetType === "chart"}>
         <div className="grid gap-3">
           <Label htmlFor="chart-type">Chart Type</Label>
           <select
@@ -105,13 +105,16 @@ export const WidgetFormFields = ({
           >
             <option value="">Select chart type</option>
             <option value="line">Line Chart</option>
-            <option value="candlestick">Candlestick Chart</option>
           </select>
+          <p className="text-xs text-muted-foreground">
+            Line charts show price trends over time with optional moving
+            averages.
+          </p>
         </div>
       </ConditionalRenderer>
 
       {/* Card Type - Only show for card widgets */}
-      <ConditionalRenderer isVisible={widgetType === 'card'}>
+      <ConditionalRenderer isVisible={widgetType === "card"}>
         <div className="grid gap-3">
           <Label htmlFor="card-type">Card Type</Label>
           <select

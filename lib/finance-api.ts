@@ -27,7 +27,7 @@ export interface ApiKey {
   id: string;
   name: string;
   key: string;
-  provider?: "finnhub";
+  provider?: "nseindia";
   createdAt: string;
   lastUsed?: string;
   isValid?: boolean;
@@ -38,42 +38,33 @@ export interface ApiKey {
  * Get popular stock symbols from all available symbols
  */
 export const getPopularStockSymbols = (symbols: StockSymbol[]): string[] => {
-  const popularCompanies = [
-    "AAPL",
-    "GOOGL",
-    "MSFT",
-    "AMZN",
-    "TSLA",
-    "META",
-    "NVDA",
-    "NFLX",
-    "UBER",
-    "LYFT",
-    "SPOTIFY",
-    "ZOOM",
-    "SLACK",
-    "PAYPAL",
-    "NETFLIX",
-    "ADOBE",
-    "SALESFORCE",
-    "ORACLE",
-    "IBM",
-    "INTEL",
-    "AMD",
-    "QUALCOMM",
+  // Indian popular companies for NSE India API
+  const popularIndianCompanies = [
+    "RELIANCE",
+    "TCS", 
+    "HDFCBANK",
+    "INFY",
+    "HINDUNILVR",
+    "ICICIBANK",
+    "KOTAKBANK",
+    "LT",
+    "ASIANPAINT",
+    "MARUTI",
+    "BHARTIARTL",
+    "ITC",
+    "SBIN",
+    "AXISBANK",
+    "BAJFINANCE",
+    "WIPRO",
+    "ULTRACEMCO",
+    "NESTLEIND",
+    "POWERGRID",
+    "NTPC"
   ];
 
-  const filtered = symbols
-    .filter(
-      (symbol) =>
-        symbol.type === "Common Stock" &&
-        popularCompanies.includes(symbol.symbol) &&
-        !symbol.symbol.includes(".")
-    )
-    .slice(0, 20)
-    .map((symbol) => symbol.symbol);
-
-  return filtered.length > 0 ? filtered : popularCompanies.slice(0, 8);
+  // For NSE India, just return the popular symbols directly
+  // since we're using mock data from the API
+  return popularIndianCompanies.slice(0, 8);
 };
 
 /**
@@ -91,7 +82,7 @@ export const fetchAllSymbols = async (
       body: JSON.stringify({
         symbol: "",
         apiKey: apiKey.key,
-        provider: apiKey.provider || "finnhub",
+        provider: apiKey.provider || "nseindia",
         dataType: "symbols",
       }),
     });
@@ -124,7 +115,7 @@ export const fetchStockData = async (
       body: JSON.stringify({
         symbol: symbol,
         apiKey: apiKey.key,
-        provider: apiKey.provider || "finnhub",
+        provider: apiKey.provider || "nseindia",
         dataType: "quote",
       }),
     });
@@ -211,9 +202,9 @@ export const calculateStockChange = (stockData: StockData) => {
  * Format currency value
  */
 export const formatCurrency = (value: number): string => {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);

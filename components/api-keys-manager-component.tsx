@@ -25,7 +25,7 @@ export const ApiKeysManagerComponent = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [newKeyValue, setNewKeyValue] = useState("");
-  const [newKeyProvider, setNewKeyProvider] = useState("finnhub");
+  const [newKeyProvider, setNewKeyProvider] = useState("nseindia");
   const [errorMessage, setErrorMessage] = useState("");
   const [isTestingKey, setIsTestingKey] = useState(false);
 
@@ -63,7 +63,7 @@ export const ApiKeysManagerComponent = () => {
       }
 
       // If validation passes, save the key
-      addApiKey(newKeyName, newKeyValue, "finnhub");
+      addApiKey(newKeyName, newKeyValue, "nseindia");
 
       // Find the newly added key and update validation status
       const addedKey = getApiKeyByName(newKeyName);
@@ -85,7 +85,7 @@ export const ApiKeysManagerComponent = () => {
   const handleCancelAddKey = () => {
     setNewKeyName("");
     setNewKeyValue("");
-    setNewKeyProvider("finnhub");
+    setNewKeyProvider("nseindia");
     setErrorMessage("");
     setIsAddDialogOpen(false);
   };

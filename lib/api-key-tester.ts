@@ -3,7 +3,7 @@
 
 export interface TestApiKeyRequest {
   apiKey: string;
-  provider?: "finnhub";
+  provider?: "nseindia";
 }
 
 export interface TestApiKeyResponse {
@@ -19,9 +19,7 @@ export interface TestApiKeyResponse {
  * @param provider The financial data provider (defaults to 'alphavantage')
  * @returns Promise with test results
  */
-export async function testApiKey(
-  apiKey: string
-): Promise<TestApiKeyResponse> {
+export async function testApiKey(apiKey: string): Promise<TestApiKeyResponse> {
   try {
     const response = await fetch("/api/test-api-key", {
       method: "POST",
@@ -30,7 +28,7 @@ export async function testApiKey(
       },
       body: JSON.stringify({
         apiKey,
-        provider: "finnhub",
+        provider: "nseindia",
       } as TestApiKeyRequest),
     });
 
@@ -42,7 +40,7 @@ export async function testApiKey(
       message: `Network error: ${
         error instanceof Error ? error.message : "Unknown error"
       }`,
-      provider: "finnhub",
+      provider: "nseindia",
     };
   }
 }
@@ -56,7 +54,7 @@ export async function testMultipleApiKeys(
   apiKeys: Array<{
     id: string;
     key: string;
-    provider?: "finnhub";
+    provider?: "nseindia";
   }>
 ): Promise<Array<{ id: string; result: TestApiKeyResponse }>> {
   const promises = apiKeys.map(async ({ id, key }) => ({
@@ -72,17 +70,17 @@ export async function testMultipleApiKeys(
  * @returns Array of supported provider names
  */
 export function getSupportedProviders(): Array<{
-  id: "finnhub";
+  id: "nseindia";
   name: string;
   description: string;
   websiteUrl: string;
 }> {
   return [
     {
-      id: "finnhub",
-      name: "Finnhub",
-      description: "Real-time stock market data and financial news API",
-      websiteUrl: "https://finnhub.io/",
+      id: "nseindia",
+      name: "NSE India",
+      description: "National Stock Exchange of India API",
+      websiteUrl: "https://www.nseindia.com/",
     },
   ];
 }
@@ -93,9 +91,10 @@ export function getSupportedProviders(): Array<{
  * @param provider The provider to validate against
  * @returns Object with validation result and message
  */
-export function validateApiKeyFormat(
-  apiKey: string
-): { isValid: boolean; message: string } {
+export function validateApiKeyFormat(apiKey: string): {
+  isValid: boolean;
+  message: string;
+} {
   if (!apiKey || apiKey.trim().length === 0) {
     return {
       isValid: false,
@@ -105,11 +104,11 @@ export function validateApiKeyFormat(
 
   const trimmedKey = apiKey.trim();
 
-  // Finnhub keys are typically 20 characters, alphanumeric
-  if (!/^[A-Za-z0-9]{15,25}$/.test(trimmedKey)) {
+  // NSE India API keys are typically alphanumeric strings
+  if (!/^[A-Za-z0-9]{8,50}$/.test(trimmedKey)) {
     return {
       isValid: false,
-      message: "Finnhub API keys should be 15-25 alphanumeric characters",
+      message: "NSE India API keys should be 8-50 alphanumeric characters",
     };
   }
 

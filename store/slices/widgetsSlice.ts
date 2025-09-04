@@ -5,7 +5,7 @@ export interface Widget {
   name: string;
   type: "table" | "card" | "chart";
   stockSymbol: string;
-  chartType?: "line" | "candlestick";
+  chartType?: "line";
   cardType?: "watchlist" | "gainers" | "performance" | "financial";
   refreshInterval: number;
   apiKeyId: string;

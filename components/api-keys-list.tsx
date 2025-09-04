@@ -7,7 +7,7 @@ interface ApiKey {
   id: string;
   name: string;
   key: string;
-  provider?: "finnhub";
+  provider?: "nseindia";
   createdAt: string;
   lastUsed?: string;
   isValid?: boolean;

@@ -20,6 +20,7 @@ import {
 } from "@/lib/api/finance-api";
 import { Widget } from "@/store/slices/widgetsSlice";
 import { useComprehensiveFinanceCard } from "@/lib/hooks/use-comprehensive-finance-card";
+import { UI, FINANCE_CARD } from "@/constants";
 
 interface ComprehensiveFinanceCardProps {
   widget: Widget;
@@ -323,7 +324,7 @@ export const ComprehensiveFinanceCard = ({
               />
             </button>
             {(mainStockData || marketMovers) && (
-              <span className="hidden sm:inline">Updated: {new Date().toLocaleTimeString()}</span>
+              <span className="hidden sm:inline">{UI.UPDATED}: {new Date().toLocaleTimeString()}</span>
             )}
           </div>
         </div>
@@ -338,7 +339,7 @@ export const ComprehensiveFinanceCard = ({
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <span className="hidden sm:inline">Overview</span>
+            <span className="hidden sm:inline">{FINANCE_CARD.OVERVIEW}</span>
             <span className="sm:hidden">View</span>
           </button>
           <button

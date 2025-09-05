@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Plus as PlusIcon } from "lucide-react";
 import { ApiKeySelector } from "@/components/api-keys/api-key-selector";
 import { WidgetFormFields } from "@/components/widgets/widget-form-fields";
+import { WIDGETS, UI } from "@/constants";
 // Lazy load AddApiKeyDialog since it's only opened when user needs to add a new API key
 const AddApiKeyDialog = dynamic(
   () =>
@@ -73,16 +74,14 @@ export const NewWidgetDialog = () => {
             size="sm"
             className="bg-primary hover:bg-primary/90 text-white border-none rounded-md"
           >
-            <PlusIcon className="h-4 w-4 mr-1.5" /> Add Widget
+            <PlusIcon className="h-4 w-4 mr-1.5" /> {WIDGETS.ADD_WIDGET}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add New Widget</DialogTitle>
+            <DialogTitle>{WIDGETS.ADD_NEW_WIDGET}</DialogTitle>
             <DialogDescription>
-              Create a new financial widget to display real-time stock data on
-              your dashboard. Choose from comprehensive finance cards, stock
-              tables, or price charts.
+              {WIDGETS.ADD_DESCRIPTION}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddWidget}>
@@ -124,14 +123,14 @@ export const NewWidgetDialog = () => {
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline" type="button">
-                  Cancel
+                  {UI.CANCEL}
                 </Button>
               </DialogClose>
               <Button
                 type="submit"
                 className="bg-primary hover:bg-primary/90 text-white"
               >
-                <PlusIcon className="h-4 w-4 mr-1.5" /> Add Widget
+                <PlusIcon className="h-4 w-4 mr-1.5" /> {WIDGETS.ADD_WIDGET}
               </Button>
             </DialogFooter>
           </form>

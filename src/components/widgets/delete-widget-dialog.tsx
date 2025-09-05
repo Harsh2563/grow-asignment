@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
+import { WIDGETS, UI } from "@/constants";
 
 interface DeleteWidgetDialogProps {
   widget: Widget | null;
@@ -34,13 +35,13 @@ export const DeleteWidgetDialog: React.FC<DeleteWidgetDialogProps> = ({
   const getWidgetTypeLabel = (type: string) => {
     switch (type) {
       case "table":
-        return "Table Widget";
+        return WIDGETS.TABLE_WIDGET;
       case "card":
-        return "Finance Card";
+        return WIDGETS.FINANCE_CARD;
       case "chart":
-        return "Chart Widget";
+        return WIDGETS.CHART_WIDGET;
       default:
-        return "Widget";
+        return WIDGETS.WIDGET;
     }
   };
 
@@ -55,9 +56,9 @@ export const DeleteWidgetDialog: React.FC<DeleteWidgetDialogProps> = ({
               <AlertTriangle className="h-6 w-6 text-destructive" />
             </div>
             <div>
-              <DialogTitle>Delete Widget</DialogTitle>
+              <DialogTitle>{WIDGETS.DELETE_WIDGET}</DialogTitle>
               <DialogDescription className="mt-1">
-                This action cannot be undone.
+                {WIDGETS.DELETE_DESCRIPTION}
               </DialogDescription>
             </div>
           </div>
@@ -68,7 +69,7 @@ export const DeleteWidgetDialog: React.FC<DeleteWidgetDialogProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Type
+                  {WIDGETS.TYPE_LABEL}
                 </span>
                 <span className="text-sm font-medium">
                   {getWidgetTypeLabel(widget.type)}
@@ -77,7 +78,7 @@ export const DeleteWidgetDialog: React.FC<DeleteWidgetDialogProps> = ({
               {widget.stockSymbol && (
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-muted-foreground">
-                    Symbol
+                    {WIDGETS.SYMBOL_LABEL}
                   </span>
                   <span className="text-sm font-medium">
                     {widget.stockSymbol}
@@ -86,7 +87,7 @@ export const DeleteWidgetDialog: React.FC<DeleteWidgetDialogProps> = ({
               )}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Created
+                  {WIDGETS.CREATED_LABEL}
                 </span>
                 <span className="text-sm font-medium">
                   {new Date(widget.createdAt).toLocaleDateString()}
@@ -96,8 +97,7 @@ export const DeleteWidgetDialog: React.FC<DeleteWidgetDialogProps> = ({
           </div>
 
           <p className="text-sm text-muted-foreground">
-            Are you sure you want to delete this widget? All its data and
-            configuration will be permanently removed from your dashboard.
+            {WIDGETS.DELETE_CONFIRMATION}
           </p>
         </div>
 
@@ -106,13 +106,13 @@ export const DeleteWidgetDialog: React.FC<DeleteWidgetDialogProps> = ({
             variant="outline"
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            {UI.CANCEL}
           </Button>
           <Button
             variant="destructive"
             onClick={handleDelete}
           >
-            Delete Widget
+            {WIDGETS.DELETE_WIDGET}
           </Button>
         </DialogFooter>
       </DialogContent>

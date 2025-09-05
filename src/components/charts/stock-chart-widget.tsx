@@ -27,6 +27,7 @@ import {
   type StockData,
 } from "@/lib/api/finance-api";
 import { VolumeChart } from "./volume-chart";
+import { STOCK_CHART, UI } from "@/constants";
 
 interface StockChartWidgetProps {
   widgetId: string;
@@ -162,7 +163,7 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
         <div className="text-center flex items-center justify-center flex-1">
           <p className="text-destructive mb-4">{error}</p>
           <Button onClick={fetchData} variant="outline">
-            Retry
+            {UI.RETRY}
           </Button>
         </div>
       </Card>

@@ -2,6 +2,7 @@
 
 import { ChartBarIcon } from "lucide-react";
 import * as React from "react";
+import { DASHBOARD } from "@/constants";
 
 export default function InitialBackground() {
   return (
@@ -13,13 +14,12 @@ export default function InitialBackground() {
         <div className="space-y-6">
           <div>
             <h1 className="text-xl font-bold text-white mb-2">
-              Build your own dashboard
+              {DASHBOARD.EMPTY_TITLE}
             </h1>
           </div>
 
           <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Create custom widgets for watchlists, gainers, and price charts.
-            Rearrange them the way you like and personalize your finance view.
+            {DASHBOARD.EMPTY_DESCRIPTION}
           </p>
         </div>
       </div>

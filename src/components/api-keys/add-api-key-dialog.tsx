@@ -9,6 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { NewApiKeyForm } from "@/components/api-keys/new-api-key-form";
+import { API_KEYS } from "@/constants";
 
 interface AddApiKeyDialogProps {
   isOpen: boolean;
@@ -47,10 +48,9 @@ export const AddApiKeyDialog = ({
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New API Key</DialogTitle>
+          <DialogTitle>{API_KEYS.ADD_NEW_API_KEY}</DialogTitle>
           <DialogDescription>
-            Enter a name and value for your API key. The key will be tested
-            before saving to ensure it works properly.
+            {API_KEYS.ADD_DESCRIPTION}
           </DialogDescription>
         </DialogHeader>
 

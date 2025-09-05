@@ -13,6 +13,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { BarChart3 } from "lucide-react";
 import { ConditionalRenderer } from "@/components/ui/ConditionalRenderer";
+import { LOADING } from "@/constants";
 
 // Lazy load FinanceTableWidget to reduce initial bundle size
 const FinanceTableWidget = dynamic(
@@ -26,7 +27,7 @@ const FinanceTableWidget = dynamic(
         <div className="flex items-center justify-center flex-1">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           <span className="ml-2 text-muted-foreground">
-            Loading table widget...
+                        Loading ...
           </span>
         </div>
       </Card>
@@ -46,7 +47,7 @@ const StockChartWidget = dynamic(
       <Card className="p-6 h-[550px] flex flex-col">
         <div className="flex items-center justify-center flex-1">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <span className="ml-2 text-muted-foreground">Loading chart...</span>
+          <span className="ml-2 text-muted-foreground">{LOADING.CHART}</span>
         </div>
       </Card>
     ),
@@ -66,7 +67,7 @@ const ComprehensiveFinanceCard = dynamic(
         <div className="flex items-center justify-center flex-1">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           <span className="ml-2 text-muted-foreground">
-            Loading ...
+            {LOADING.DEFAULT}
           </span>
         </div>
       </Card>

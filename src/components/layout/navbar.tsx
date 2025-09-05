@@ -13,15 +13,16 @@ import {
 } from "@/components/ui/sheet";
 import { Home, Settings, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NAVIGATION } from "@/constants";
 
 const navItems = [
   {
-    name: "Dashboard",
+    name: NAVIGATION.DASHBOARD,
     href: "/",
     icon: Home,
   },
   {
-    name: "Settings",
+    name: NAVIGATION.SETTINGS,
     href: "/settings",
     icon: Settings,
   },
@@ -91,12 +92,12 @@ export const Navbar = () => {
           <SheetTrigger asChild>
             <Button variant="ghost" size="sm" className="p-2">
               <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle menu</span>
+              <span className="sr-only">{NAVIGATION.TOGGLE_MENU}</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-[280px] sm:w-[400px]">
             <SheetHeader>
-              <SheetTitle className="text-left">Navigation</SheetTitle>
+              <SheetTitle className="text-left">{NAVIGATION.NAVIGATION}</SheetTitle>
             </SheetHeader>
             <div className="flex flex-col gap-2 mt-6">
               {navItems.map((item) => {

@@ -8,6 +8,7 @@ import { Key as KeyIcon, Plus as PlusIcon } from "lucide-react";
 import { ConditionalRenderer } from "@/components/ui/ConditionalRenderer";
 import { EmptyApiKeysState } from "@/components/api-keys/empty-api-keys-state";
 import { ApiKeysList } from "@/components/api-keys/api-keys-list";
+import { API_KEYS, UI } from "@/constants";
 
 const AddApiKeyDialog = dynamic(
   () =>
@@ -43,18 +44,18 @@ export const ApiKeysManagerComponent = () => {
     setErrorMessage("");
 
     if (!newKeyName.trim()) {
-      setErrorMessage("API Key name is required");
+      setErrorMessage(API_KEYS.NAME_REQUIRED);
       return;
     }
 
     if (!newKeyValue.trim()) {
-      setErrorMessage("API Key value is required");
+      setErrorMessage(API_KEYS.VALUE_REQUIRED);
       return;
     }
 
     const existingKey = getApiKeyByName(newKeyName);
     if (existingKey) {
-      setErrorMessage("An API Key with this name already exists");
+      setErrorMessage(API_KEYS.NAME_EXISTS);
       return;
     }
 
@@ -65,8 +66,8 @@ export const ApiKeysManagerComponent = () => {
 
       if (!testResult.success) {
         setErrorMessage(
-          `API Key validation failed: ${
-            testResult.message || "The API key is not working properly"
+          `${API_KEYS.VALIDATION_FAILED}: ${
+            testResult.message || API_KEYS.DEFAULT_VALIDATION_ERROR
           }`
         );
         return;
@@ -84,9 +85,7 @@ export const ApiKeysManagerComponent = () => {
       handleCancelAddKey();
     } catch (error) {
       console.error("Error testing API key:", error);
-      setErrorMessage(
-        "Failed to test API key. Please check your internet connection and try again."
-      );
+      setErrorMessage(API_KEYS.CONNECTION_ERROR);
     } finally {
       setIsTestingKey(false);
     }
@@ -101,7 +100,7 @@ export const ApiKeysManagerComponent = () => {
   };
 
   const handleDeleteKey = (id: string) => {
-    if (confirm("Are you sure you want to delete this API key?")) {
+    if (confirm(API_KEYS.DELETE_CONFIRM)) {
       deleteApiKey(id);
     }
   };
@@ -110,7 +109,7 @@ export const ApiKeysManagerComponent = () => {
     <div className="p-4">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold flex items-center">
-          <KeyIcon className="mr-2 h-5 w-5" /> API Keys
+          <KeyIcon className="mr-2 h-5 w-5" /> {API_KEYS.TITLE}
         </h2>
 
         <ConditionalRenderer isVisible={apiKeys.length > 0}>
@@ -119,7 +118,7 @@ export const ApiKeysManagerComponent = () => {
             className="bg-primary hover:bg-primary/90 text-white border-none rounded-md"
             onClick={() => setIsAddDialogOpen(true)}
           >
-            <PlusIcon className="h-4 w-4 mr-1.5" /> Add API Key
+            <PlusIcon className="h-4 w-4 mr-1.5" /> {API_KEYS.ADD_API_KEY}
           </Button>
         </ConditionalRenderer>
       </div>

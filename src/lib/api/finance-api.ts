@@ -3,6 +3,8 @@
  * Handles all financial data API calls for the application
  */
 
+import { STOCK } from "@/constants";
+
 export interface StockData {
   symbol: string;
   name?: string; // Company name (optional)
@@ -41,28 +43,7 @@ export interface ApiKey {
  */
 export const getPopularStockSymbols = (symbols: StockSymbol[]): string[] => {
   // Indian popular companies for NSE India API
-  const popularIndianCompanies = [
-    "RELIANCE",
-    "TCS",
-    "HDFCBANK",
-    "INFY",
-    "HINDUNILVR",
-    "ICICIBANK",
-    "KOTAKBANK",
-    "LT",
-    "ASIANPAINT",
-    "MARUTI",
-    "BHARTIARTL",
-    "ITC",
-    "SBIN",
-    "AXISBANK",
-    "BAJFINANCE",
-    "WIPRO",
-    "ULTRACEMCO",
-    "NESTLEIND",
-    "POWERGRID",
-    "NTPC",
-  ];
+  const popularIndianCompanies = STOCK.POPULAR_COMPANIES;
 
   // For NSE India, just return the popular symbols directly
   // since we're using mock data from the API

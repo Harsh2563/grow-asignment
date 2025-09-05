@@ -170,19 +170,19 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
   }
 
   return (
-    <Card className="p-6 h-[550px] flex flex-col">
+    <Card className="p-3 sm:p-6 h-[400px] sm:h-[550px] flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 flex-shrink-0">
-        <div>
-          <h3 className="text-lg font-semibold">{symbol} Price Chart</h3>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 flex-shrink-0 gap-2">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base sm:text-lg font-semibold truncate">{symbol} Price Chart</h3>
           <ConditionalRenderer isVisible={!!currentPrice}>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-2xl font-bold">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-1">
+              <span className="text-lg sm:text-2xl font-bold">
                 ${currentPrice?.c.toFixed(2)}
               </span>
               <ConditionalRenderer isVisible={!!priceChange}>
                 <span
-                  className={`text-sm ${
+                  className={`text-xs sm:text-sm ${
                     priceChange?.isPositive ? "text-green-600" : "text-red-600"
                   }`}
                 >
@@ -198,25 +198,33 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
 
         {/* Chart Type Badge */}
         <div className="flex items-center gap-2">
-          <span className="px-2 py-1 bg-primary/10 text-primary rounded text-sm font-medium">
+          <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs sm:text-sm font-medium">
             Line Chart
           </span>
         </div>
       </div>
 
       {/* Interval Selector */}
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-sm font-medium">Interval:</span>
-        {(["daily", "weekly", "monthly"] as ChartInterval[]).map((interval) => (
-          <Button
-            key={interval}
-            variant={selectedInterval === interval ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedInterval(interval)}
-          >
-            {interval.charAt(0).toUpperCase() + interval.slice(1)}
-          </Button>
-        ))}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-4">
+        <span className="text-xs sm:text-sm font-medium">Interval:</span>
+        <div className="flex gap-1 sm:gap-2">
+          {(["daily", "weekly", "monthly"] as ChartInterval[]).map((interval) => (
+            <Button
+              key={interval}
+              variant={selectedInterval === interval ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedInterval(interval)}
+              className="text-xs sm:text-sm px-2 sm:px-3"
+            >
+              <span className="hidden sm:inline">
+                {interval.charAt(0).toUpperCase() + interval.slice(1)}
+              </span>
+              <span className="sm:hidden">
+                {interval.charAt(0).toUpperCase()}
+              </span>
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Chart */}

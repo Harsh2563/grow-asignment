@@ -42,7 +42,7 @@ export const SortableWidgetItem: React.FC<SortableWidgetItemProps> = ({
   return (
     <div ref={setNodeRef} style={style} className="relative group">
       {/* Drag Handle */}
-      <div className="absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+      <div className="absolute -left-6 sm:-left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 hidden sm:block">
         <div
           {...attributes}
           {...listeners}
@@ -62,35 +62,35 @@ export const SortableWidgetItem: React.FC<SortableWidgetItemProps> = ({
       </div>
 
       {/* Control Buttons */}
-      <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
+      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 flex gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
         <Button
           variant="secondary"
           size="sm"
           onClick={() => onConfigure(widget.id)}
-          className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm border shadow-sm hover:bg-background"
+          className="h-6 w-6 sm:h-8 sm:w-8 p-0 bg-background/90 backdrop-blur-sm border shadow-sm hover:bg-background"
           title="Configure widget"
         >
-          <Settings className="h-4 w-4" />
+          <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
         </Button>
         <Button
           variant="secondary"
           size="sm"
           onClick={() => onToggleVisibility(widget.id)}
-          className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm border shadow-sm hover:bg-background"
+          className="h-6 w-6 sm:h-8 sm:w-8 p-0 bg-background/90 backdrop-blur-sm border shadow-sm hover:bg-background"
         >
           {widget.isVisible ? (
-            <Eye className="h-4 w-4" />
+            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
           ) : (
-            <EyeOff className="h-4 w-4" />
+            <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" />
           )}
         </Button>
         <Button
           variant="destructive"
           size="sm"
           onClick={() => onDelete(widget.id)}
-          className="h-8 w-8 p-0 bg-red-500/90 backdrop-blur-sm shadow-sm hover:bg-red-600"
+          className="h-6 w-6 sm:h-8 sm:w-8 p-0 bg-red-500/90 backdrop-blur-sm shadow-sm hover:bg-red-600"
         >
-          <Trash2 className="h-4 w-4" />
+          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
         </Button>
       </div>
     </div>

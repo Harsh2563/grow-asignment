@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
+import { DragEndEvent } from "@dnd-kit/core";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import {
   deleteWidget,
@@ -10,7 +11,7 @@ import {
   Widget,
 } from "@/store/slices/widgetsSlice";
 import { Card } from "@/components/ui/card";
-import { TrendingUp, BarChart3, Table } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 import { ConditionalRenderer } from "@/components/ui/ConditionalRenderer";
 
 // Lazy load FinanceTableWidget to reduce initial bundle size
@@ -154,12 +155,12 @@ export const WidgetsList = () => {
 
   const visibleWidgets = widgets.filter((widget) => widget.isVisible);
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (active.id !== over?.id) {
-      const oldIndex = widgets.findIndex((widget) => widget.id === active.id);
-      const newIndex = widgets.findIndex((widget) => widget.id === over?.id);
+      const oldIndex = widgets.findIndex((widget) => widget.id === String(active.id));
+      const newIndex = widgets.findIndex((widget) => widget.id === String(over?.id));
 
       if (oldIndex !== -1 && newIndex !== -1) {
         dispatch(reorderWidgets({ oldIndex, newIndex }));
@@ -226,23 +227,25 @@ export const WidgetsList = () => {
 
   return (
     <div>
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">Your Widgets</h2>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Your Widgets</h2>
             <p className="text-muted-foreground mt-2">
               {widgets.length} widget{widgets.length !== 1 ? "s" : ""} in your
               dashboard
             </p>
             {visibleWidgets.length > 0 && (
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground mt-1 hidden sm:block">
                 💡 Hover over widgets to see drag handles and controls
               </p>
             )}
           </div>
 
           <ConditionalRenderer isVisible={widgets.length > 0}>
-            <WidgetsManager />
+            <div className="w-full sm:w-auto">
+              <WidgetsManager />
+            </div>
           </ConditionalRenderer>
         </div>
       </div>
@@ -262,13 +265,13 @@ export const WidgetsList = () => {
       </ConditionalRenderer>
 
       <ConditionalRenderer isVisible={visibleWidgets.length > 0}>
-        <div className="pl-8">
+        <div className="pl-0 sm:pl-8">
           {visibleWidgets.length > 1 ? (
             <DragDropProvider
               items={visibleWidgets.map((widget) => widget.id)}
               onDragEnd={handleDragEnd}
             >
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {visibleWidgets.map((widget) => (
                   <SortableWidgetItem
                     key={widget.id}
@@ -283,7 +286,7 @@ export const WidgetsList = () => {
               </div>
             </DragDropProvider>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {visibleWidgets.map((widget) => (
                 <SortableWidgetItem
                   key={widget.id}

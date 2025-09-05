@@ -79,13 +79,13 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
   return (
     <Card className="w-full h-[520px] flex flex-col">
       <CardHeader className="pb-3 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            {widget.name}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg min-w-0">
+            <span className="truncate">{widget.name}</span>
           </CardTitle>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {loading && <RefreshCw className="h-4 w-4 animate-spin" />}
-            <span>Updated: {new Date().toLocaleTimeString()}</span>
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+            {loading && <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />}
+            <span className="hidden sm:inline">Updated: {new Date().toLocaleTimeString()}</span>
           </div>
         </div>
       </CardHeader>
@@ -117,14 +117,14 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
         ) : (
           <>
             {/* Search Bar */}
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   placeholder="Search stocks or filter results..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-9"
+                  className="pl-9 pr-9 text-sm"
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
                       handleSearch();
@@ -148,10 +148,11 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
                   searchedStocks.has(searchQuery.trim().toUpperCase()) ||
                   loading
                 }
-                className="flex-shrink-0"
+                className="flex-shrink-0 w-full sm:w-auto"
               >
                 <Search className="h-4 w-4 mr-1" />
-                Add Stock
+                <span className="hidden sm:inline">Add Stock</span>
+                <span className="sm:hidden">Add</span>
               </Button>
             </div>
 
@@ -183,10 +184,10 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[100px]">Symbol</TableHead>
-                    <TableHead>Name</TableHead>
+                    <TableHead className="w-[80px] sm:w-[100px]">Symbol</TableHead>
+                    <TableHead className="hidden sm:table-cell">Name</TableHead>
                     <TableHead className="text-right">Price</TableHead>
-                    <TableHead className="text-right">Change</TableHead>
+                    <TableHead className="text-right hidden sm:table-cell">Change</TableHead>
                     <TableHead className="text-right">Change %</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -206,17 +207,19 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
 
                       return (
                         <TableRow key={stock.symbol}>
-                          <TableCell className="font-medium">
-                            {stock.symbol}
+                          <TableCell className="font-medium text-sm">
+                            <span className="truncate block">{stock.symbol}</span>
                           </TableCell>
-                          <TableCell className="max-w-[200px] truncate">
+                          <TableCell className="max-w-[200px] truncate hidden sm:table-cell">
                             {stock.name || stock.symbol}
                           </TableCell>
-                          <TableCell className="text-right">
-                            {formatCurrency(stock.c)}
+                          <TableCell className="text-right text-sm">
+                            <span className="truncate block">
+                              {formatCurrency(stock.c)}
+                            </span>
                           </TableCell>
                           <TableCell
-                            className={`text-right ${
+                            className={`text-right hidden sm:table-cell ${
                               isPositive ? "text-green-600" : "text-red-600"
                             }`}
                           >
@@ -226,15 +229,28 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
                               ) : (
                                 <TrendingDown className="h-3 w-3" />
                               )}
-                              {formatCurrency(Math.abs(change.amount))}
+                              <span className="truncate">
+                                {formatCurrency(Math.abs(change.amount))}
+                              </span>
                             </div>
                           </TableCell>
                           <TableCell
-                            className={`text-right ${
+                            className={`text-right text-sm ${
                               isPositive ? "text-green-600" : "text-red-600"
                             }`}
                           >
-                            {formatPercentage(change.percentage)}
+                            <div className="flex items-center justify-end gap-1 sm:gap-0">
+                              <span className="sm:hidden">
+                                {isPositive ? (
+                                  <TrendingUp className="h-3 w-3" />
+                                ) : (
+                                  <TrendingDown className="h-3 w-3" />
+                                )}
+                              </span>
+                              <span className="truncate">
+                                {formatPercentage(change.percentage)}
+                              </span>
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
@@ -246,13 +262,18 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="mt-4 flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{" "}
-                  {Math.min(currentPage * ITEMS_PER_PAGE, stocksData.length)} of{" "}
-                  {stocksData.length} stocks
+              <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <p className="text-xs sm:text-sm text-muted-foreground order-2 sm:order-1">
+                  <span className="hidden sm:inline">
+                    Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{" "}
+                    {Math.min(currentPage * ITEMS_PER_PAGE, stocksData.length)} of{" "}
+                    {stocksData.length} stocks
+                  </span>
+                  <span className="sm:hidden">
+                    {currentPage} of {totalPages}
+                  </span>
                 </p>
-                <Pagination>
+                <Pagination className="order-1 sm:order-2">
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
@@ -271,9 +292,19 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
                       />
                     </PaginationItem>
 
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                      (page) => (
-                        <PaginationItem key={page}>
+                    {Array.from({ length: Math.min(totalPages, 3) }, (_, i) => {
+                      let page;
+                      if (totalPages <= 3) {
+                        page = i + 1;
+                      } else if (currentPage <= 2) {
+                        page = i + 1;
+                      } else if (currentPage >= totalPages - 1) {
+                        page = totalPages - 2 + i;
+                      } else {
+                        page = currentPage - 1 + i;
+                      }
+                      return (
+                        <PaginationItem key={page} className="hidden sm:inline-flex">
                           <PaginationLink
                             href="#"
                             isActive={currentPage === page}
@@ -285,8 +316,8 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
                             {page}
                           </PaginationLink>
                         </PaginationItem>
-                      )
-                    )}
+                      );
+                    })}
 
                     <PaginationItem>
                       <PaginationNext

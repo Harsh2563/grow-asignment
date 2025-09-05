@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { ConditionalRenderer } from "@/components/ui/ConditionalRenderer";
 import { useWidgetsManager } from "@/lib/hooks/use-widgets-manager";
+import { DeleteWidgetDialog } from "./delete-widget-dialog";
 
 const getWidgetIcon = (type: string) => {
   switch (type) {
@@ -56,9 +57,12 @@ export const WidgetsManager = () => {
     setIsOpen,
     hiddenWidgets,
     visibleWidgets,
+    deleteDialog,
 
     // Handlers
     handleDeleteWidget,
+    handleConfirmDeleteWidget,
+    handleCloseDeleteDialog,
     handleToggleVisibility,
     handleShowAllHidden,
     handleDeleteAllHidden,
@@ -248,6 +252,14 @@ export const WidgetsManager = () => {
           </div>
         </div>
       </DialogContent>
+
+      {/* Delete Widget Dialog */}
+      <DeleteWidgetDialog
+        widget={deleteDialog.widget}
+        isOpen={deleteDialog.isOpen}
+        onOpenChange={handleCloseDeleteDialog}
+        onConfirmDelete={handleConfirmDeleteWidget}
+      />
     </Dialog>
   );
 };

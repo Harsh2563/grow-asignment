@@ -3,12 +3,20 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import {
   deleteWidget,
   toggleWidgetVisibility,
+  Widget,
 } from "@/store/slices/widgetsSlice";
 
 export const useWidgetsManager = () => {
   const dispatch = useAppDispatch();
   const widgets = useAppSelector((state) => state.widgets.widgets);
   const [isOpen, setIsOpen] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    widget: Widget | null;
+  }>({
+    isOpen: false,
+    widget: null,
+  });
 
   // Filter widgets by visibility
   const { hiddenWidgets, visibleWidgets } = useMemo(() => {
@@ -19,8 +27,33 @@ export const useWidgetsManager = () => {
 
   // Handle deleting a single widget
   const handleDeleteWidget = (id: string) => {
-    if (confirm("Are you sure you want to delete this widget?")) {
-      dispatch(deleteWidget(id));
+    const widget = widgets.find((w) => w.id === id);
+    if (widget) {
+      setDeleteDialog({
+        isOpen: true,
+        widget,
+      });
+    }
+  };
+
+  // Handle confirming widget deletion
+  const handleConfirmDeleteWidget = () => {
+    if (deleteDialog.widget) {
+      dispatch(deleteWidget(deleteDialog.widget.id));
+      setDeleteDialog({
+        isOpen: false,
+        widget: null,
+      });
+    }
+  };
+
+  // Handle closing delete dialog
+  const handleCloseDeleteDialog = (open: boolean) => {
+    if (!open) {
+      setDeleteDialog({
+        isOpen: false,
+        widget: null,
+      });
     }
   };
 
@@ -55,9 +88,12 @@ export const useWidgetsManager = () => {
     setIsOpen,
     hiddenWidgets,
     visibleWidgets,
+    deleteDialog,
 
     // Handlers
     handleDeleteWidget,
+    handleConfirmDeleteWidget,
+    handleCloseDeleteDialog,
     handleToggleVisibility,
     handleShowAllHidden,
     handleDeleteAllHidden,

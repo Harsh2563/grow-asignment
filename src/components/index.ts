@@ -18,6 +18,7 @@ export * from "./api-keys/add-api-key-dialog";
 export * from "./api-keys/api-key-selector";
 export * from "./api-keys/api-keys-list";
 export * from "./api-keys/api-keys-manager-component";
+export * from "./api-keys/delete-api-key-dialog";
 export * from "./api-keys/empty-api-keys-state";
 export * from "./api-keys/new-api-key-form";
 

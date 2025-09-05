@@ -20,6 +20,17 @@ const AddApiKeyDialog = dynamic(
     ssr: false,
   }
 );
+
+const DeleteApiKeyDialog = dynamic(
+  () =>
+    import("@/components/api-keys/delete-api-key-dialog").then((mod) => ({
+      default: mod.DeleteApiKeyDialog,
+    })),
+  {
+    loading: () => null, // loading state not needed for dialog
+    ssr: false,
+  }
+);
 import { useApiKeys } from "@/lib/hooks/use-api-keys";
 
 export const ApiKeysManagerComponent = () => {
@@ -34,6 +45,8 @@ export const ApiKeysManagerComponent = () => {
   } = useApiKeys();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [apiKeyToDelete, setApiKeyToDelete] = useState<any>(null);
   const [newKeyName, setNewKeyName] = useState("");
   const [newKeyValue, setNewKeyValue] = useState("");
   const [newKeyProvider, setNewKeyProvider] = useState("nseindia");
@@ -100,8 +113,17 @@ export const ApiKeysManagerComponent = () => {
   };
 
   const handleDeleteKey = (id: string) => {
-    if (confirm(API_KEYS.DELETE_CONFIRM)) {
-      deleteApiKey(id);
+    const keyToDelete = apiKeys.find(key => key.id === id);
+    if (keyToDelete) {
+      setApiKeyToDelete(keyToDelete);
+      setIsDeleteDialogOpen(true);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (apiKeyToDelete) {
+      deleteApiKey(apiKeyToDelete.id);
+      setApiKeyToDelete(null);
     }
   };
 
@@ -144,6 +166,13 @@ export const ApiKeysManagerComponent = () => {
         onProviderChange={setNewKeyProvider}
         onSubmit={handleAddKey}
         onCancel={handleCancelAddKey}
+      />
+
+      <DeleteApiKeyDialog
+        apiKey={apiKeyToDelete}
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirmDelete={handleConfirmDelete}
       />
     </div>
   );

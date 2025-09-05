@@ -81,7 +81,7 @@ export function useCachedStockData(
 ) {
   const {
     refreshInterval = 0,
-    cacheTime = 5 * 60 * 1000, // 5 minutes
+    cacheTime: _cacheTime = 5 * 60 * 1000, // 5 minutes
     staleTime = 30 * 1000, // 30 seconds
     enabled = true,
   } = options;
@@ -253,18 +253,18 @@ export function useCachedMarketMovers(
   options: UseCachedApiOptions = {}
 ) {
   const {
-    refreshInterval = 60, // Default 1 minute for market movers
-    staleTime = 30 * 1000, // 30 seconds
+    refreshInterval: _refreshInterval = 60, // Default 1 minute for market movers
+    staleTime: _staleTime = 30 * 1000, // 30 seconds
   } = options;
 
-  const [data, setData] = useState<{
+  const [data] = useState<{
     gainers: StockData[];
     losers: StockData[];
   }>({ gainers: [], losers: [] });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading] = useState(true);
+  const [error] = useState<string | null>(null);
 
-  const cacheKey = `market-movers-${apiKey?.id}`;
+  const _cacheKey = `market-movers-${apiKey?.id}`;
 
   // Similar implementation as useCachedStockData but for market movers
   // ... (implementation details omitted for brevity)

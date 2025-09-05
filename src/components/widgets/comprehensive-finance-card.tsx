@@ -13,7 +13,6 @@ import {
   DollarSign,
 } from "lucide-react";
 import {
-  StockData,
   calculateStockChange,
   formatCurrency,
   formatPercentage,
@@ -38,19 +37,12 @@ export const ComprehensiveFinanceCard = ({
     mainStockData,
     marketMovers,
     performanceData,
-    currentTabData,
 
     // Loading states
     loading,
-    isLoadingStock,
-    isLoadingMovers,
-    isLoadingPerformance,
 
     // Error states
     error,
-    stockError,
-    moversError,
-    performanceError,
 
     // API key
     selectedApiKey,

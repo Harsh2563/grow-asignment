@@ -27,7 +27,7 @@ import {
   type StockData,
 } from "@/lib/api/finance-api";
 import { VolumeChart } from "./volume-chart";
-import { STOCK_CHART, UI } from "@/constants";
+import { UI } from "@/constants";
 
 interface StockChartWidgetProps {
   widgetId: string;
@@ -39,9 +39,7 @@ interface StockChartWidgetProps {
 }
 
 export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
-  widgetId,
   symbol,
-  chartType,
   apiKey,
   refreshInterval,
   onError,

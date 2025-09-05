@@ -34,7 +34,6 @@ export const WidgetConfigurationDialog: React.FC<
     setWidgetName,
     refreshInterval,
     setRefreshInterval,
-    selectedApiKeyId,
     setSelectedApiKeyId,
     newKeyName,
     setNewKeyName,

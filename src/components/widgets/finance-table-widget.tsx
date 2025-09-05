@@ -68,7 +68,6 @@ export const FinanceTableWidget = ({ widget }: TableWidgetProps) => {
 
     // Data refetch
     refetchPopular,
-    invalidatePopularStocks,
 
     // Constants
     ITEMS_PER_PAGE,

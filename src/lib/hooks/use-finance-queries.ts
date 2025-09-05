@@ -10,7 +10,6 @@ import {
   fetchPerformanceData,
   searchStockData,
   fetchMultipleStocksData,
-  StockData,
   StockSymbol,
   ApiKey,
 } from "@/lib/api/finance-api";

@@ -14,14 +14,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ConditionalRenderer } from "@/components/ui/ConditionalRenderer";
 import {
-  fetchChartData,
   convertToLineData,
-  formatChartDataForInterval,
-  type ChartDataPoint,
   type LineChartData,
   type ChartInterval,
 } from "@/lib/services/chart-data-service";
-import { type ApiKey, type StockData } from "@/lib/api/finance-api";
+import { type ApiKey } from "@/lib/api/finance-api";
 import {
   useStockData,
   useChartData,
@@ -38,7 +35,6 @@ interface StockChartWidgetProps {
 }
 
 export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
-  widgetId,
   symbol,
   chartType,
   apiKey,
@@ -49,7 +45,7 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
   const [selectedInterval, setSelectedInterval] =
     useState<ChartInterval>("daily");
   const [showMA, setShowMA] = useState(false);
-  const [movingAverages, setMovingAverages] = useState<{
+  const [movingAverages] = useState<{
     ma20: Array<{ date: string; ma: number }>;
     ma50: Array<{ date: string; ma: number }>;
   }>({ ma20: [], ma50: [] });

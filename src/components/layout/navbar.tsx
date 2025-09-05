@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Home, Settings, Menu, X } from "lucide-react";
+import { Home, Settings, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAVIGATION } from "@/constants";
 

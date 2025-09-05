@@ -45,7 +45,6 @@ export const NewWidgetDialog = () => {
     setChartType,
     refreshInterval,
     setRefreshInterval,
-    selectedApiKeyId,
     setSelectedApiKeyId,
     newKeyName,
     setNewKeyName,

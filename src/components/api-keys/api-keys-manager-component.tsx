@@ -8,7 +8,8 @@ import { Key as KeyIcon, Plus as PlusIcon } from "lucide-react";
 import { ConditionalRenderer } from "@/components/ui/ConditionalRenderer";
 import { EmptyApiKeysState } from "@/components/api-keys/empty-api-keys-state";
 import { ApiKeysList } from "@/components/api-keys/api-keys-list";
-import { API_KEYS, UI } from "@/constants";
+import { API_KEYS } from "@/constants";
+import { ApiKey } from "@/types";
 
 const AddApiKeyDialog = dynamic(
   () =>
@@ -40,13 +41,11 @@ export const ApiKeysManagerComponent = () => {
     deleteApiKey,
     getApiKeyByName,
     updateKeyValidationStatus,
-    getSelectedApiKey,
-    selectApiKey,
   } = useApiKeys();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [apiKeyToDelete, setApiKeyToDelete] = useState<any>(null);
+  const [apiKeyToDelete, setApiKeyToDelete] = useState<ApiKey | null>(null);
   const [newKeyName, setNewKeyName] = useState("");
   const [newKeyValue, setNewKeyValue] = useState("");
   const [newKeyProvider, setNewKeyProvider] = useState("nseindia");

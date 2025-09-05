@@ -41,7 +41,7 @@ export interface ApiKey {
 /**
  * Get popular stock symbols from all available symbols
  */
-export const getPopularStockSymbols = (symbols: StockSymbol[]): string[] => {
+export const getPopularStockSymbols = (): string[] => {
   // Indian popular companies for NSE India API
   const popularIndianCompanies = STOCK.POPULAR_COMPANIES;
 
@@ -150,7 +150,7 @@ export const fetchPopularStocksData = async (
     symbols = await fetchAllSymbols(apiKey);
   }
 
-  const stockSymbols = getPopularStockSymbols(symbols);
+  const stockSymbols = getPopularStockSymbols();
   const stocksData = await fetchMultipleStocksData(stockSymbols, apiKey);
 
   return {

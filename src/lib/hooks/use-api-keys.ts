@@ -7,7 +7,6 @@ import {
   deleteApiKey as deleteApiKeyAction,
   recordKeyUsage as recordKeyUsageAction,
   updateKeyValidation,
-  setApiKeys,
   setSelectedApiKey,
   clearSelectedApiKey,
   type ApiKey,
@@ -41,7 +40,7 @@ export function useApiKeys() {
       provider,
       isActive: true,
     };
-    const result = dispatch(addApiKeyAction(newKey));
+    dispatch(addApiKeyAction(newKey));
 
     // Return a basic object - the component will find the actual key from the store
     return { name, key, provider, isActive: true };

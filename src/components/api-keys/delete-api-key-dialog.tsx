@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Key } from "lucide-react";
-import { API_KEYS, UI } from "@/constants";
+import { UI } from "@/constants";
 
 interface ApiKey {
   id: string;

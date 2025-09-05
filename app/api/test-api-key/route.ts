@@ -12,7 +12,7 @@ export interface TestApiKeyResponse {
   data?: unknown;
 }
 
-async function testNSEIndiaKey(apiKey: string) {
+async function testNSEIndiaKey(_apiKey: string) {
   try {
     const testSymbol = "RELIANCE.NS";
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${testSymbol}`;

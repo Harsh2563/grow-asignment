@@ -121,7 +121,7 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
       return (
         <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
           <p className="font-medium">{`Date: ${label}`}</p>
-          <p className="text-blue-600">{`Price: $${payload[0].value.toFixed(
+          <p className="text-blue-600">{`Price: ₹${payload[0].value.toFixed(
             2
           )}`}</p>
           {data.volume && (
@@ -177,7 +177,7 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
           <ConditionalRenderer isVisible={!!currentPrice}>
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-1">
               <span className="text-lg sm:text-2xl font-bold">
-                ${currentPrice?.c.toFixed(2)}
+                ₹{currentPrice?.c.toFixed(2)}
               </span>
               <ConditionalRenderer isVisible={!!priceChange}>
                 <span
@@ -255,7 +255,7 @@ export const StockChartWidget: React.FC<StockChartWidgetProps> = ({
             <YAxis
               domain={["dataMin - 5", "dataMax + 5"]}
               tick={{ fontSize: 12 }}
-              tickFormatter={(value) => `$${value.toFixed(0)}`}
+              tickFormatter={(value) => `₹${value.toFixed(0)}`}
             />
             <Tooltip content={<CustomTooltip />} />
 

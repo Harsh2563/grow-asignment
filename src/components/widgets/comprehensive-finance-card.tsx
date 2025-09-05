@@ -10,7 +10,7 @@ import {
   ArrowDownRight,
   Activity,
   BarChart3,
-  DollarSign,
+  IndianRupee,
 } from "lucide-react";
 import {
   calculateStockChange,
@@ -301,7 +301,7 @@ export const ComprehensiveFinanceCard = ({
       <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 text-base sm:text-lg min-w-0">
-            <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <IndianRupee className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
             <span className="truncate">{widget.name}</span>
           </CardTitle>
           <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">

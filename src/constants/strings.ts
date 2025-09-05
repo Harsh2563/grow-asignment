@@ -216,7 +216,7 @@ export const STRINGS = {
 
   // Currency
   CURRENCY: {
-    SYMBOL: "$",
+    SYMBOL: "₹",
     FORMAT_LOCALE: "en-IN",
     CURRENCY_CODE: "INR",
   },

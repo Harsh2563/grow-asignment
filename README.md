@@ -1,22 +1,18 @@
-# 📊 Finance Dashboard - Advanced- **Modern UI/UX**
+# 📊 Finance Dashboard - Indian Stock Market
 
-- **Dark/Light Mode**: System-aware theme switching with next-themes
-- **Responsive Design**: Optimized for desktop, tablet, and mobile
-- **Smooth Animations**: CSS animations and transitions throughout
-- **Component Library**: Custom UI components built on Radix UI primitives
-- **Performance First**: Lazy loading ensures fast initial page loads
-
-### 🚀 **Performance Features**
-
-- **Code Splitting**: Automatic component-level code splitting with Next.js dynamic imports
-- **Lazy Loading**: Heavy libraries (charts, drag-drop) load only when needed
-- **Progressive Loading**: Core functionality loads first, enhancements follow Application
-
-A sophisticated, full-featured financial dashboard built with Next.js 15, featuring real-time data visualization, intelligent caching, and a modular architecture designed for scalability and performance.
+A sophisticated, full-featured financial dashboard built with Next.js 15, designed specifically for the Indian stock market. Features real-time NSE data visualization, intelligent caching, and a modular architecture optimized for Indian trading hours and INR currency.
 
 ## 🌟 Key Features
 
-### 🎛️ **Dynamic Widget System**
+### �🇳 **Indian Stock Market Specialized**
+
+- **NSE Integration**: Built exclusively for National Stock Exchange (NSE) data
+- **Popular Indian Stocks**: RELIANCE, TCS, HDFCBANK, INFY, HINDUNILVR, ICICIBANK, and more
+- **INR Currency Support**: All prices displayed in Indian Rupees (₹)
+- **Indian Market Hours**: Optimized for NSE trading sessions
+- **Yahoo Finance Backend**: Reliable data source for Indian equities
+
+### �🎛️ **Dynamic Widget System**
 
 - **Drag & Drop Interface**: Reorder widgets with smooth animations using `@dnd-kit`
 - **Multiple Widget Types**:
@@ -101,9 +97,18 @@ src/
 
 ### 📡 **API Integration**
 
+- **Indian Stock Market Focus**: 
+  - **Built exclusively for NSE India**: Works with National Stock Exchange (NSE) listed companies
+  - **Yahoo Finance API Integration**: Reliable data source for Indian stocks (.NS suffix)
+  - **Popular Indian stocks**: RELIANCE, TCS, HDFCBANK, INFY, HINDUNILVR, ICICIBANK, KOTAKBANK, and more
+  - **INR currency formatting**: All prices displayed in Indian Rupees (₹)
+  - **Indian market hours awareness**: Data updates aligned with NSE trading hours
+- **No External API Keys Required**: Works out-of-the-box with built-in Indian stock data
 - **React Query**: Server state management with automatic background updates
 - **Error Boundaries**: Graceful error handling and recovery
 - **Retry Logic**: Exponential backoff for failed requests
+
+**Note**: This application is specifically designed and optimized for the Indian stock market using NSE data through Yahoo Finance API.
 
 ### 🎯 **Performance Optimizations**
 
@@ -208,9 +213,13 @@ npm run type-check   # Run TypeScript compiler check
 
 1. Navigate to Settings page
 2. Click "Add New API Key"
-3. Choose your provider (Alpha Vantage, Finnhub, etc.)
-4. Enter your API key and give it a name
-5. Test the connection
+3. **For Indian Stock Market (Primary)**:
+   - Select "NSE India" provider
+   - Enter any dummy API key (the app uses Yahoo Finance for NSE data)
+   - Give it a descriptive name like "NSE India Data"
+4. Test the connection
+
+**Important Note**: This application is built specifically for Indian stock market data and works primarily with NSE-listed companies. The API key setup is available for extensibility but the core functionality works with built-in Indian stock data through Yahoo Finance.
 
 ### **Creating Widgets**
 
@@ -278,8 +287,15 @@ npm run type-check   # Run TypeScript compiler check
 
 For support, email raiharsh030@gmail.com or create an issue in the repository.
 
+## ⚠️ **Important Notes**
+
+- **Single API Focus**: This application is built and tested specifically for Indian stock market data using NSE listings
+- **Primary Data Source**: Yahoo Finance API for Indian equities (symbols with .NS suffix)
+- **Market Specialization**: Optimized for Indian trading hours, INR currency, and NSE-listed companies
+- **No External Keys Required**: Core functionality works without external API subscriptions
+
 ---
 
 **Built with ❤️ by [Harsh Rai](https://github.com/Harsh2563)**
 
-_A modern, performant, and scalable financial dashboard showcasing advanced React patterns, intelligent caching strategies, and exceptional user experience design._
+_A modern, performant, and scalable financial dashboard specialized for the Indian stock market, showcasing advanced React patterns, intelligent caching strategies, and exceptional user experience design._

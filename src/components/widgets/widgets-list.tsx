@@ -127,6 +127,25 @@ const WidgetConfigurationDialog = dynamic(
 );
 import { useApiKeys } from "@/lib/hooks/use-api-keys";
 
+// Lazy load DeleteWidgetDialog since it's only opened on user interaction
+const DeleteWidgetDialog = dynamic(
+  () =>
+    import("@/components/widgets/delete-widget-dialog").then((mod) => ({
+      default: mod.DeleteWidgetDialog,
+    })),
+  {
+    loading: () => (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+        <div className="bg-background rounded-lg p-4 flex items-center gap-2">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+          <span className="text-sm">Loading dialog...</span>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
+
 // Lazy load drag and drop components since they're only needed when widgets exist and need to be reordered
 const DragDropProvider = dynamic(
   () => import("@/components/widgets/drag-drop-provider"),
@@ -152,6 +171,8 @@ export const WidgetsList = () => {
   );
   const [isConfigurationDialogOpen, setIsConfigurationDialogOpen] =
     useState(false);
+  const [widgetToDelete, setWidgetToDelete] = useState<Widget | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const visibleWidgets = widgets.filter((widget) => widget.isVisible);
 
@@ -169,8 +190,17 @@ export const WidgetsList = () => {
   };
 
   const handleDeleteWidget = (id: string) => {
-    if (confirm("Are you sure you want to delete this widget?")) {
-      dispatch(deleteWidget(id));
+    const widget = widgets.find((w) => w.id === id);
+    if (widget) {
+      setWidgetToDelete(widget);
+      setIsDeleteDialogOpen(true);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (widgetToDelete) {
+      dispatch(deleteWidget(widgetToDelete.id));
+      setWidgetToDelete(null);
     }
   };
 
@@ -311,6 +341,14 @@ export const WidgetsList = () => {
           onOpenChange={setIsConfigurationDialogOpen}
         />
       )}
+
+      {/* Delete Widget Dialog */}
+      <DeleteWidgetDialog
+        widget={widgetToDelete}
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirmDelete={handleConfirmDelete}
+      />
     </div>
   );
 };

@@ -95,6 +95,19 @@ src/
 - **Typed Hooks**: Fully typed useAppSelector and useAppDispatch
 - **Slice-Based Architecture**: Modular state management by feature
 
+### 🔑 Setting Up API Keys (Step-by-Step)
+
+**To connect external data sources, you can add your own API keys**:
+
+1. Navigate to the Settings page in the dashboard.
+2. Click "Add New API Key".
+3. Get an Indian Stock Market API Key:
+  - Go to the Indian API Website.
+  - In the navbar, select API Hub.
+  - Click "Get Indian Stock Market API Key".
+  - Log in (or create an account).
+  - Copy your generated API key.
+
 ### 📡 **API Integration**
 
 - **Indian Stock Market Focus**: 
